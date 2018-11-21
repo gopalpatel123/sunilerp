@@ -44,10 +44,10 @@ $this->set('title', 'Category');
 						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h($stockGroup->name) ?></td>
-							<td><?= $stockGroup->has('parent_stock_group') ? $this->Html->link($stockGroup->parent_stock_group->name, ['controller' => 'StockGroups', 'action' => 'view', $stockGroup->parent_stock_group->id]) : '' ?></td>
+							<td><?= $stockGroup->has('parent_stock_group') ? $stockGroup->parent_stock_group->name : '' ?></td>
 							<td class="actions">
 							<?php if (in_array("57", $userPages)){?>
-								<?= $this->Html->link(__('Edit'), ['action' => 'edit', $stockGroup->id]) ?>
+								<?= $this->Html->link(__('Edit'), ['action' => 'appEditCategory', $stockGroup->id]) ?>
 								<?php }?>
 							</td>
 						</tr>

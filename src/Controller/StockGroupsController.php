@@ -28,7 +28,7 @@ class StockGroupsController extends AppController
             'contain' => ['ParentStockGroups', 'Companies'],
 			'limit' => 100
         ];
-        $stockGroups = $this->paginate($this->StockGroups->find()->where(['StockGroups.company_id'=>$company_id,'is_status'=>'web'])->where([
+        $stockGroups = $this->paginate($this->StockGroups->find()->where(['StockGroups.company_id'=>$company_id,'StockGroups.is_status'=>'web'])->where([
 		'OR' => [
             'StockGroups.name LIKE' => '%'.$search.'%',
 			//...
@@ -118,7 +118,7 @@ class StockGroupsController extends AppController
             }
             $this->Flash->error(__('The App category could not be saved. Please, try again.'));
         }
-		$parentStockGroups = $this->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'is_status'=>'app']);
+		$parentStockGroups = $this->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app']);
         $this->set(compact('stockGroup', 'parentStockGroups'));
         $this->set('_serialize', ['stockGroup']);
 	}
@@ -141,6 +141,28 @@ class StockGroupsController extends AppController
         $this->set(compact('stockGroups','search'));
         $this->set('_serialize', ['stockGroups']);
 	}
+	
+	 public function appEditCategory($id = null)
+    {
+		$this->viewBuilder()->layout('index_layout');
+        $stockGroup = $this->StockGroups->get($id, [
+            'contain' => []
+        ]);
+		$company_id=$this->Auth->User('session_company_id');
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $stockGroup = $this->StockGroups->patchEntity($stockGroup, $this->request->getData());
+            if ($this->StockGroups->save($stockGroup)) {
+                $this->Flash->success(__('The App Category has been saved.'));
+
+                return $this->redirect(['action' => 'appCategoryIndex']);
+            }
+            $this->Flash->error(__('The App Category could not be saved. Please, try again.'));
+        }
+        $parentStockGroups = $this->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app','id NOT IN'=>$id,'parent_id NOT IN'=>$id]);
+        $companies = $this->StockGroups->Companies->find('list');
+        $this->set(compact('stockGroup', 'parentStockGroups', 'companies'));
+        $this->set('_serialize', ['stockGroup']);
+    }
 
     /**
      * Edit method
