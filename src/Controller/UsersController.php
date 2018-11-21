@@ -131,7 +131,7 @@ class UsersController extends AppController
     {        
     	$this->viewBuilder()->layout('index_layout');
     }
-	public function appmasterSetup()
+	public function appMasterSetup()
     {        
     	$this->viewBuilder()->layout('index_layout');
     }
