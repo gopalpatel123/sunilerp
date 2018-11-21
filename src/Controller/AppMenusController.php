@@ -21,7 +21,7 @@ class AppMenusController extends AppController
     public function index()
     {
 		$this->viewBuilder()->layout('index_layout');
-		$company_id=$this->Auth->User('session_company_id');
+		$user_id=$this->Auth->User('id');
 		
         $this->paginate = [
             'contain' => ['ParentAppMenus']
@@ -58,8 +58,10 @@ class AppMenusController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
 		$company_id=$this->Auth->User('session_company_id');
+		$user_id=$this->Auth->User('id');
         $appMenu = $this->AppMenus->newEntity();
         if ($this->request->is('post')) {
+			
             $appMenu = $this->AppMenus->patchEntity($appMenu, $this->request->getData());
             if ($this->AppMenus->save($appMenu)) {
                 $this->Flash->success(__('The app menu has been saved.'));
