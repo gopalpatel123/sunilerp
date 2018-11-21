@@ -21,12 +21,20 @@ class AppHomeScreensController extends AppController
     public function index()
     {
 		$this->viewBuilder()->layout('index_layout');
+		$search=$this->request->query('search');
         $this->paginate = [
             'contain' => ['StockGroups']
         ];
-        $appHomeScreens = $this->paginate($this->AppHomeScreens);
+        $appHomeScreens = $this->paginate($this->AppHomeScreens->find()->where([
+		'OR' => [
+            'AppHomeScreens.title LIKE' => '%'.$search.'%',
+			//...
+			'AppHomeScreens.layout LIKE' => '%'.$search.'%',
+			//...
+			'StockGroups.name LIKE' => '%'.$search.'%'
+		 ]]));
 
-        $this->set(compact('appHomeScreens'));
+        $this->set(compact('appHomeScreens','search'));
         $this->set('_serialize', ['appHomeScreens']);
     }
 
