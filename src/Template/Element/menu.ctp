@@ -145,6 +145,12 @@ if(!empty(count(array_intersect($userPages, $target)))){
 echo '<li>'.$this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-cab']).'Masters & Setup', '/Users/masterSetup',['escape' => false]).'</li>';
 }?>
 
+<?php 
+$target=array("88");
+if(!empty(count(array_intersect($userPages, $target)))){
+echo '<li>'.$this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-cab']).'APP Masters & Setup', '/Users/appMasterSetup',['escape' => false]).'</li>';
+}?>
+
 <?php if (in_array("82", $userPages)){
 echo '<li>'.$this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-edit']).'User Rights', '/userRights/add',['escape' => false]).'</li>';
 }?>

@@ -2,7 +2,8 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
+use Cake\Filesystem\Folder;
+use Cake\Filesystem\File;
 /**
  * StockGroups Controller
  *
@@ -27,7 +28,7 @@ class StockGroupsController extends AppController
             'contain' => ['ParentStockGroups', 'Companies'],
 			'limit' => 100
         ];
-        $stockGroups = $this->paginate($this->StockGroups->find()->where(['StockGroups.company_id'=>$company_id])->where([
+        $stockGroups = $this->paginate($this->StockGroups->find()->where(['StockGroups.company_id'=>$company_id,'is_status'=>'web'])->where([
 		'OR' => [
             'StockGroups.name LIKE' => '%'.$search.'%',
 			//...
@@ -68,6 +69,7 @@ class StockGroupsController extends AppController
         if ($this->request->is('post')) {
             $stockGroup = $this->StockGroups->patchEntity($stockGroup, $this->request->getData());
 			$stockGroup->company_id = $company_id;
+			$stockGroup->is_status = 'web';
             if ($this->StockGroups->save($stockGroup)) {
                 $this->Flash->success(__('The stock group has been saved.'));
 
@@ -79,6 +81,66 @@ class StockGroupsController extends AppController
         $this->set(compact('stockGroup', 'parentStockGroups'));
         $this->set('_serialize', ['stockGroup']);
     }
+	
+	public function appAdd(){
+		$this->viewBuilder()->layout('index_layout');
+		$company_id=$this->Auth->User('session_company_id');
+        $stockGroup = $this->StockGroups->newEntity();
+		
+		 if ($this->request->is('post')) {
+            $stockGroup = $this->StockGroups->patchEntity($stockGroup, $this->request->getData());
+			$stockGroup->company_id = $company_id;
+			$stock_group_image=$this->request->getData('stock_group_image');
+			
+			if(!empty($stock_group_image['tmp_name'])){
+				$extt=explode('/',$stock_group_image['type']);
+				$ext=$extt[1];
+				$setNewFileName = rand(1, 100000);
+				$fullpath= WWW_ROOT."img".DS."category";
+				$statement_year = "/img/category/".$setNewFileName .'.'.$ext;
+				$res1 = is_dir($fullpath);
+				if($res1 != 1) {
+						new Folder($fullpath, true, 0777);
+					}
+				$this->request->data['stock_group_image']	=$statement_year;
+					
+			}
+			$stockGroup->stock_group_image = $this->request->data['stock_group_image'];
+			//pr($stockGroup);exit;
+            if ($this->StockGroups->save($stockGroup)) {
+				
+				if(!empty($stock_group_image['tmp_name'])){
+					move_uploaded_file($stock_group_image['tmp_name'],$fullpath.DS.$setNewFileName .'.'. $ext);
+				}
+                $this->Flash->success(__('The App category has been saved.'));
+
+                return $this->redirect(['action' => 'appAdd']);
+            }
+            $this->Flash->error(__('The App category could not be saved. Please, try again.'));
+        }
+		$parentStockGroups = $this->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'is_status'=>'app']);
+        $this->set(compact('stockGroup', 'parentStockGroups'));
+        $this->set('_serialize', ['stockGroup']);
+	}
+	
+	public function appCategoryIndex(){
+		$this->viewBuilder()->layout('index_layout');
+		$company_id=$this->Auth->User('session_company_id');
+		$search=$this->request->query('search');
+		$this->paginate = [
+            'contain' => ['ParentStockGroups', 'Companies'],
+			'limit' => 100
+        ];
+        $stockGroups = $this->paginate($this->StockGroups->find()->where(['StockGroups.company_id'=>$company_id,'StockGroups.is_status'=>'app'])->where([
+		'OR' => [
+            'StockGroups.name LIKE' => '%'.$search.'%',
+			//...
+			'ParentStockGroups.name LIKE' => '%'.$search.'%'
+		 ]]));
+
+        $this->set(compact('stockGroups','search'));
+        $this->set('_serialize', ['stockGroups']);
+	}
 
     /**
      * Edit method
