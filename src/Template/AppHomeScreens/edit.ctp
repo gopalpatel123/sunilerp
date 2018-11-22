@@ -6,7 +6,7 @@
 $this->set('title', 'Edit App Home Screen');
 ?>
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-md-8">
 		<div class="portlet light ">
 			<div class="portlet-title">
 				<div class="caption">
@@ -29,7 +29,7 @@ $this->set('title', 'Edit App Home Screen');
 									<label>Layout</label>
 									<?php 
 									$layout=[];
-									$layout=[['text'=>'Circle','value'=>'circle'],['text'=>'Horizontal','value'=>'horizontal'],['text'=>'Banner','value'=>'banner'],['text'=>'Store Directory','value'=>'store directory']];
+									$layout=[['text'=>'Single Image','value'=>'single image'],['text'=>'Horizontal','value'=>'horizontal'],['text'=>'Banner','value'=>'banner'],['text'=>'Brand Layout','value'=>'brand layout'],['text'=>'2-Image Layout','value'=>'2-image layout'],['text'=>'3-Image Layout','value'=>'3-image layout',['text'=>'4-Image Layout','value'=>'4-image layout']]];
 									
 									echo $this->Form->control('layout',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Layout-', 'options' => $layout]); ?>
 								</div>
@@ -56,7 +56,7 @@ $this->set('title', 'Edit App Home Screen');
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>Category</label>
-									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Primary Group-', 'options' => $parentStockGroups]); ?>
+									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group_id','label'=>false,'empty'=>'-Category Group-', 'options' => $parentStockGroups]); ?>
 								</div>
 							</div>
 						</div>	
@@ -75,6 +75,16 @@ $this->set('title', 'Edit App Home Screen');
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
+									<label>Sub-Category</label>
+									 <?php echo $this->requestAction('/StockGroups/editStockSubGroup?stock_group_id='.$appHomeScreen->stock_group_id.'&sub_category_id='.$appHomeScreen->sub_category_id); ?>
+								</div>
+							</div>
+						</div>	
+						
+						<div class="row">
+							
+							<div class="col-md-6">
+								<div class="form-group">
 									<label>Model Name</label>
 									<?php 
 									$model_name=[];
@@ -83,14 +93,6 @@ $this->set('title', 'Edit App Home Screen');
 									echo $this->Form->control('model_name',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Screen Type-', 'options' => $model_name]); ?>
 								</div>
 							
-							</div>
-						</div>
-						<div class="row">	
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Image</label>
-									<?php echo $this->Form->control('image',['class'=>'form-control input-sm image','label'=>false, 'type' =>'file','id'=>'image']); ?>
-								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
@@ -102,6 +104,15 @@ $this->set('title', 'Edit App Home Screen');
 									echo $this->Form->control('section_show',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Status-', 'options' => $section_show]); ?>
 								</div>
 							</div>
+						</div>
+						<div class="row">	
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Image</label>
+									<?php echo $this->Form->control('image',['class'=>'form-control input-sm image','label'=>false, 'type' =>'file','id'=>'image']); ?>
+								</div>
+							</div>
+							
 						</div>
 						<div class="row">
 							<div class="col-md-12">
@@ -185,6 +196,22 @@ $this->set('title', 'Edit App Home Screen');
 	$js='
 	$(document).ready(function() {
 	  ComponentsPickers.init();
+	  
+	  $(".stock_group_id").change(function(){
+		var stock_group_id = $(this).val();
+		var url="'.$this->Url->build(["controller"=>"StockGroups","action"=>"stockSubGroup"]).'";
+					url=url+"/"+stock_group_id;
+					$.ajax({ 
+						url:url,
+						type:"GET",
+						}).done(function(response){  
+						$("#sub_category_id").html(response);
+						$("select[name=sub_category_id]").select2();
+					}); 
+		
+		
+	});
+	  
     $(".image").change(function(){
 
    var fup = document.getElementById("stock_group_image");

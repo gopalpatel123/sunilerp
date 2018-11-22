@@ -104,8 +104,12 @@ class AppHomeScreensController extends AppController
             }
             $this->Flash->error(__('The app home screen could not be saved. Please, try again.'));
         }
-        $parentStockGroups = $this->AppHomeScreens->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app']);
-        $this->set(compact('appHomeScreen', 'parentStockGroups'));
+        
+		$parentStockGroups = $this->AppHomeScreens->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app']);
+		
+		$stockSubgroups=$this->AppHomeScreens->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id]);
+		
+        $this->set(compact('appHomeScreen', 'parentStockGroups','stockSubgroups'));
         $this->set('_serialize', ['appHomeScreen']);
     }
 

@@ -219,6 +219,27 @@ class StockGroupsController extends AppController
         //$stockGroup = $this->StockGroups->get($id);
 		$stockSubgroups=$this->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id,'StockGroups.parent_id' => $id]); //pr($stockSubgroups); exit;
 		$this->set(compact('stockSubgroups'));
+    } 
+	
+	public function editStockSubGroup($id = null,$child_id=null)
+    { 
+		$this->viewBuilder()->layout('');
+		$company_id=$this->Auth->User('session_company_id');
+        //$stockGroup = $this->StockGroups->get($id);
+		$stock_group_id=$this->request->query('stock_group_id');
+		$sub_category_id=$this->request->query('sub_category_id');
+		$stockSubgroups=$this->StockGroups->find()->where(['StockGroups.company_id'=>$company_id,'StockGroups.parent_id' => $stock_group_id]); 
+		$options=[];
+		foreach($stockSubgroups as $stockSubgroup){ 
+			if($stockSubgroup->id == $sub_category_id){
+				$value=$stockSubgroup->id;
+			}
+				$options[]=['text'=>$stockSubgroup->name,'value'=>$stockSubgroup->id];
+			
+			
+		}
+		//pr($options); exit;
+		$this->set(compact('options','value'));
     }
 	
 	
