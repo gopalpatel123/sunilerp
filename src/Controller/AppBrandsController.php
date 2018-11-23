@@ -62,12 +62,6 @@ class AppBrandsController extends AppController
 			$this->request->data['created_by']=$user_id;
 		    $brand_image=$this->request->getData('brand_image');
 			
-				$item_error=$brand_image['error'];
-				if(empty($item_error))
-				{
-					$item_ext=explode('/',$brand_image['type']);
-					$item_item_image='brand'.time().'.'.$item_ext[1];
-				}
 				
 				//$deletekeyname = 'video/'.$item_item_image;
 				//$this->AwsFile->deleteMatchingObjects($deletekeyname);
@@ -77,22 +71,16 @@ class AppBrandsController extends AppController
 				$appBrand = $this->AppBrands->patchEntity($appBrand, $this->request->getData());
 				if($this->AppBrands->save($appBrand)) {
 					if(!empty($brand_image['tmp_name'])){
-						/* $extt=explode('/',$brand_image['type']);
-						$ext=$extt[1];
-						$setNewFileName = rand(1, 100000);
-						$fullpath= WWW_ROOT."img".DS."brand".DS.$appBrand->id;
-						$path = "/img/brand/".$appBrand->id."/".$setNewFileName .'.'.$ext;
-						$res1 = is_dir($fullpath);
-						if($res1 != 1) {
-						new Folder($fullpath, true, 0777);
-						}
-						move_uploaded_file($brand_image['tmp_name'],$fullpath.DS.$setNewFileName .'.'. $ext); */
-
+						$item_error=$brand_image['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$brand_image['type']);
+								$item_item_image='brand'.time().'.'.$item_ext[1];
+							}
+				
 						$keyname = 'Brand/'.$appBrand->id.'/'.$item_item_image;
 						$this->AwsFile->putObjectFile($keyname,$brand_image['tmp_name'],$brand_image['type']);
 				
-						
-						
 					$query = $this->AppBrands->query();
 					$query->update()
 					->set([
@@ -134,20 +122,20 @@ class AppBrandsController extends AppController
             if ($this->AppBrands->save($appBrand)) {
 				
 				if(!empty($brand_image['tmp_name'])){
-					$extt=explode('/',$brand_image['type']);
-					$ext=$extt[1];
-					$setNewFileName = rand(1, 100000);
-					$fullpath= WWW_ROOT."img".DS."brand".DS.$appBrand->id;
-					$path = "/img/brand/".$appBrand->id."/".$setNewFileName .'.'.$ext;
-					$res1 = is_dir($fullpath);
-					if($res1 != 1) {
-						new Folder($fullpath, true, 0777);
-					}
-						move_uploaded_file($brand_image['tmp_name'],$fullpath.DS.$setNewFileName .'.'. $ext);
+						$item_error=$brand_image['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$brand_image['type']);
+								$item_item_image='brand'.time().'.'.$item_ext[1];
+							}
+				
+						$keyname = 'Brand/'.$appBrand->id.'/'.$item_item_image;
+						$this->AwsFile->putObjectFile($keyname,$brand_image['tmp_name'],$brand_image['type']);
+				
 					$query = $this->AppBrands->query();
 					$query->update()
 					->set([
-						'brand_image' => $path
+						'brand_image' => $keyname
 						])
 					->where(['id' => $appBrand->id])
 					->execute();
