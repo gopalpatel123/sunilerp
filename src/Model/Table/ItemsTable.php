@@ -89,8 +89,8 @@ class ItemsTable extends Table
             'joinType' => 'INNER'
 		]);
 		
-		$this->belongsTo('Brands', [
-            'foreignKey' => 'brand_id',
+		$this->belongsTo('AppBrands', [
+            'foreignKey' => 'app_brand_id',
             'joinType' => 'INNER'
 		]);
     }

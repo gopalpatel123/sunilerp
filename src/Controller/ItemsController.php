@@ -164,6 +164,7 @@ class ItemsController extends AppController
     }
 	
 	public function appAdd(){
+		
 		$this->viewBuilder()->layout('index_layout');
 		$item = $this->Items->newEntity();
 		$company_id  = $this->Auth->User('session_company_id');
@@ -172,7 +173,7 @@ class ItemsController extends AppController
 		if ($this->request->is('post')) {
 			$item = $this->Items->patchEntity($item, $this->request->getData());
 			$quantity = $this->request->data['quantity'];
-
+			$image_url=$this->request->getData('image_url');
 			$gst_type = $item->kind_of_gst;
 			if($gst_type=='fix')
 			{
@@ -190,6 +191,28 @@ class ItemsController extends AppController
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
             if ($this->Items->save($item))
 			{
+				
+				if(!empty($image_url['tmp_name'])){
+						$item_error=$image_url['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$image_url['type']);
+								$item_item_image='item'.time().'.'.$item_ext[1];
+							}
+				
+						$keyname = 'Item/'.$item->id.'/'.$item_item_image;
+						$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
+				
+					$query = $this->Items->query();
+					$query->update()
+					->set([
+						'image_url' => $keyname
+						])
+					->where(['id' => $item->id])
+					->execute();
+				}
+				
+				
 				$barcode = new BarcodeHelper(new \Cake\View\View());
 				
 					
@@ -246,7 +269,7 @@ class ItemsController extends AppController
 		}
 		//pr($options);exit;
         $shades = $this->Items->Shades->find('list')->where(['company_id'=>$company_id]);
-        $brands = $this->Items->Brands->find('list')->where(['company_id'=>$company_id]);
+        $brands = $this->Items->AppBrands->find('list')->where(['status'=>'Active']);
         $sizes = $this->Items->Sizes->find('list')->where(['company_id'=>$company_id]);
         $gstFigures = $this->Items->GstFigures->find('list')->where(['GstFigures.company_id'=>$company_id]);
         $this->set(compact('item', 'units', 'stockGroups','sizes','shades','gstFigures','options','brands'));

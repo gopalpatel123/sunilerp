@@ -14,7 +14,7 @@ $this->set('title', 'Create Item');
 				</div>
 			</div>
 			<div class="portlet-body">
-				<?= $this->Form->create($item,['onsubmit'=>'return checkValidation()','allow_to_submit'=>'0','id'=>'CreateItem']) ?>
+				<?= $this->Form->create($item,['onsubmit'=>'return checkValidation()','allow_to_submit'=>'0','id'=>'CreateItem','type'=>'file']) ?>
 				<div class="row">
 				
 					<div class="col-md-6">
@@ -61,7 +61,7 @@ $this->set('title', 'Create Item');
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>Brands </label>
-									<?php echo $this->Form->control('brand_id',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Brands-', 'options' => $brands]); ?>
+									<?php echo $this->Form->control('app_brand_id',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Brands-', 'options' => $brands]); ?>
 								</div>
 							</div>
 						</div>
@@ -70,6 +70,20 @@ $this->set('title', 'Create Item');
 								<div class="form-group">
 									<label>Description </label>
 									<?php echo $this->Form->control('description',['class'=>'form-control input-sm','label'=>false,'rows'=>'2']); ?>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label>Image</label>
+									<?php echo $this->Form->control('image_url',['class'=>'form-control input-sm image','label'=>false, 'type' =>'file','id'=>'image_url']); ?>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+								<?= $this->Html->image('/img/download.png',['class'=>'img-responsive thumbnail','style'=>'height: 98px;','id'=>'imgshw1'])?>
+										
 								</div>
 							</div>
 						</div>
@@ -103,7 +117,46 @@ $this->set('title', 'Create Item');
 									<?php echo $this->Form->control('sales_rate',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Sales Rate','required'=>'required']); ?>
 								</div>
 							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Max Purchase Qty </label>
+									<?php echo $this->Form->control('max_purchase_qty',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Max Purchase Qty','required'=>'required']); ?>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Print Rate </label>
+									<?php echo $this->Form->control('print_rate',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Print Rate','required'=>'required']); ?>
+								</div>
+							</div>
 						</div>
+						<div class="row">
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Discount %</label>
+									<?php echo $this->Form->control('discount',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Sales Rate','required'=>'required']); ?>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Sales For</label>
+									<?php 
+									$salesFor=[];
+									$salesFor=[['text'=>'online','value'=>'online'],['text'=>'offline','value'=>'offline'],['text'=>'online/offline','value'=>'online/offline']];
+									echo $this->Form->control('sales_for',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Brands-', 'options' => $salesFor]); ?>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Promo Is Applicable</label>
+									<?php 
+									$promo_is_applicable=[];
+									$promo_is_applicable=[['text'=>'Yes','value'=>'Yes'],['text'=>'No','value'=>'No']];
+									echo $this->Form->control('promo_is_applicable',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Brands-', 'options' => $promo_is_applicable]); ?>
+									
+								</div>
+							</div>
+						</div>	
 						<span class="caption-subject bold " style="float:center;">Gst Rate</span><hr style="margin: 6px 0;">
 						<div class="row" >
 							<div class="col-md-3">
@@ -137,7 +190,7 @@ $this->set('title', 'Create Item');
 							</div>
 							<div class="col-md-4">
 								<div class="form-group hide_gst">
-									<label style="font-size: 10px;">Gst Greter than to Amount </label>
+									<label style="font-size: 10px;">Gst Greater than to Amount </label>
 									<?php echo $this->Form->control('second_gst_figure_id',['class'=>'form-control input-sm removeAddRequired','label'=>false,'empty'=>'-GST Figure-', 'options' => $gstFigures,'required'=>'required']); ?>
 								</div>
 							</div>
@@ -323,8 +376,51 @@ $this->set('title', 'Create Item');
 		}
 		
 ComponentsPickers.init();
+
+
+
+
     });
 	";
+	$js.='
+		$(document).ready(function(){
+			$(".image").change(function(){
+
+   var fup = document.getElementById("image_url");
+	var fileName = fup.value;
+	var ext = fileName.substring(fileName.lastIndexOf(".") + 1);
+	if(ext == "jpg" || ext == "jpeg" || ext == "png")
+	{
+		
+                 readPathh(this);
+
+	} 
+	else
+	{
+		alert("Upload jpg/jpeg/png  files only");
+		fup.focus();
+		return false;
+	}
+
+});
+	
+		});
+	
+		 function readPathh(input)
+		{ 
+			if (input.files && input.files[0])
+			{
+				var reader = new FileReader();
+				reader.onload = function (e)
+				{
+					$("#imgshw1").attr("src",e.target.result);
+
+				}
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
+		
+	';
 
 echo $this->Html->scriptBlock($js, array('block' => 'scriptBottom')); 
 ?>
