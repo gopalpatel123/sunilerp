@@ -146,7 +146,7 @@ echo '<li>'.$this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-cab']
 }?>
 
 <?php 
-$target=array("88","89","90");
+$target=array("88","89","90","91","92","93");
 if(!empty(count(array_intersect($userPages, $target)))){
 echo '<li>'.$this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-cab']).'APP Masters & Setup', '/Users/appMasterSetup',['escape' => false]).'</li>';
 }?>

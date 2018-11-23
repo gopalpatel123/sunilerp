@@ -61,7 +61,19 @@ $this->set('title', 'App Master Setup');
 						</div>
 					</div>
 					<?php }?>
-					
+					<?php
+					$target=array("93");
+					if(!empty(count(array_intersect($userPages, $target)))){?>
+					<div class="col-md-6">
+						<span class="caption-subject bold ">Delivery Charges</span>
+						<div class="list-group">
+						<?php if (in_array("93", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/DeliveryCharges/',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>
+							
+						</div>
+					</div>
+					<?php }?>
 				</div>
 			</div>
 		</div>
