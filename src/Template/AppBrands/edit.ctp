@@ -37,7 +37,9 @@
 							
 								<div class="form-group">
 									<label></label>
-									<?= $this->Html->image($appBrand->brand_image,['class'=>'img-responsive','style'=>'height: 50px; width:50px','id'=>'imgshw1'])?>
+									<?php 
+									$result=$awsFileLoad->cdnpath();
+									echo $this->Html->image($result.'/'.$appBrand->brand_image,['class'=>'img-responsive','style'=>'height: 50px; width:50px','id'=>'imgshw1']); ?>
 								</div>
 							
 							</div>

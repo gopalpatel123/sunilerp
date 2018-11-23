@@ -97,7 +97,12 @@ $this->set('title', 'App Brands');
 							<td><?= h($appBrand->status) ?></td>
 							<td><?= h($appBrand->discount) ?></td>
 							
-							<td><?= $this->Html->image($appBrand->brand_image,['class'=>'img-responsive','style'=>'height: 50px; width:50px','id'=>'imgshw1'])?></td>
+							<td>
+							<?php
+							
+							$result=$awsFileLoad->cdnpath();
+							echo $this->Html->image($result.'/'.$appBrand->brand_image,['class'=>'img-responsive','style'=>'height: 50px; width:50px','id'=>'imgshw1']); ?>
+							</td>
 							<td class="actions">
 								
 								<?= $this->Html->link(__('Edit'), ['action' => 'edit', $appBrand->id]) ?>
