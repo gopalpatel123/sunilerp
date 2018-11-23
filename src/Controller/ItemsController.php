@@ -246,7 +246,7 @@ class ItemsController extends AppController
 		}
 		//pr($options);exit;
         $shades = $this->Items->Shades->find('list')->where(['company_id'=>$company_id]);
-        $brands = $this->Items->Brands->find('list')->where(['company_id'=>$company_id]);
+        $brands = $this->Items->AppBrands->find('list')->where(['status'=>'Active']);
         $sizes = $this->Items->Sizes->find('list')->where(['company_id'=>$company_id]);
         $gstFigures = $this->Items->GstFigures->find('list')->where(['GstFigures.company_id'=>$company_id]);
         $this->set(compact('item', 'units', 'stockGroups','sizes','shades','gstFigures','options','brands'));
