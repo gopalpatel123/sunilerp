@@ -38,7 +38,7 @@ $this->set('title', 'App Master Setup');
 						<span class="caption-subject bold ">Items</span>
 						<div class="list-group">
 						<?php if (in_array("58", $userPages)){?>
-							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/Items/Add',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/Items/appAdd',['escape' => false, 'class'=>'list-group-item']); ?>
 							<?php }?>
 							<?php if (in_array("59", $userPages)){?>
 							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-list-ul menuCss']).' List', '/Items',['escape' => false, 'class'=>'list-group-item']); ?>
@@ -52,10 +52,10 @@ $this->set('title', 'App Master Setup');
 					<div class="col-md-6">
 						<span class="caption-subject bold ">Home Screens</span>
 						<div class="list-group">
-						<?php if (in_array("58", $userPages)){?>
-							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/AppHomeScreens/Add',['escape' => false, 'class'=>'list-group-item']); ?>
+						<?php if (in_array("91", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/AppHomeScreens/add',['escape' => false, 'class'=>'list-group-item']); ?>
 							<?php }?>
-							<?php if (in_array("59", $userPages)){?>
+							<?php if (in_array("92", $userPages)){?>
 							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-list-ul menuCss']).' List', '/AppHomeScreens',['escape' => false, 'class'=>'list-group-item']); ?>
 							<?php }?>
 						</div>

@@ -88,6 +88,11 @@ class ItemsTable extends Table
             'foreignKey' => 'company_id',
             'joinType' => 'INNER'
 		]);
+		
+		$this->belongsTo('Brands', [
+            'foreignKey' => 'brand_id',
+            'joinType' => 'INNER'
+		]);
     }
 
     /**

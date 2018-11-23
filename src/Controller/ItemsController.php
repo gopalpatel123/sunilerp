@@ -162,6 +162,96 @@ class ItemsController extends AppController
         $this->set(compact('item', 'units', 'stockGroups','sizes','shades','gstFigures'));
         $this->set('_serialize', ['item']);
     }
+	
+	public function appAdd(){
+		$this->viewBuilder()->layout('index_layout');
+		$item = $this->Items->newEntity();
+		$company_id  = $this->Auth->User('session_company_id');
+		$location_id = $this->Auth->User('session_location_id');
+		$this->request->data['company_id'] =$company_id;
+		if ($this->request->is('post')) {
+			$item = $this->Items->patchEntity($item, $this->request->getData());
+			$quantity = $this->request->data['quantity'];
+
+			$gst_type = $item->kind_of_gst;
+			if($gst_type=='fix')
+			{
+				$first_gst_figure_id        = $item->first_gst_figure_id;
+				$item->second_gst_figure_id = $first_gst_figure_id;
+				$item->gst_amount           = 0;
+			}
+			if($item->barcode_decision==1){
+				$item->item_code=strtoupper(uniqid());
+				$data_to_encode = $item->item_code;
+			}else{
+				$item->item_code=strtoupper($item->provided_item_code);
+				$data_to_encode = strtoupper($item->provided_item_code);
+			}
+			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
+            if ($this->Items->save($item))
+			{
+				$barcode = new BarcodeHelper(new \Cake\View\View());
+				
+					
+				// Generate Barcode data
+				$barcode->barcode();
+				$barcode->setType('C128');
+				$barcode->setCode($data_to_encode);
+				$barcode->setSize(20,100);
+				$barcode->hideCodeType('N');
+					
+				// Generate filename     
+				$file = 'img/barcode/'.$item->id.'.png';
+					
+				// Generates image file on server    
+				$barcode->writeBarcodeFile($file);
+			
+			
+				$transaction_date=$this->Auth->User('session_company')->books_beginning_from;
+				if($quantity>0)
+				{
+					$itemLedger = $this->Items->ItemLedgers->newEntity();
+					$itemLedger->item_id            = $item->id;
+					$itemLedger->transaction_date   = date("Y-m-d",strtotime($transaction_date));
+					$itemLedger->quantity           = $this->request->data['quantity'];
+					$itemLedger->rate               = $this->request->data['rate'];
+					$itemLedger->amount             = $this->request->data['amount'];
+					$itemLedger->status             = 'in';
+					$itemLedger->is_opening_balance = 'yes';
+					$itemLedger->company_id         = $company_id;
+					$itemLedger->location_id        = $location_id;
+					$this->Items->ItemLedgers->save($itemLedger);
+				}
+				
+                $this->Flash->success(__('The item has been saved.'));
+
+                return $this->redirect(['action' => 'add']);
+            }
+            $this->Flash->error(__('The item could not be saved. Please, try again.'));
+        }
+        $units = $this->Items->Units->find('list')->where(['company_id'=>$company_id]);
+        $stockGroups = $this->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']);
+		
+		$options=[];
+		$totSize=0;
+		foreach($stockGroups as $stockgroup){
+			$stockgroupsIds = $this->Items->StockGroups
+							->find('children', ['for' => $stockgroup->id])
+							->find('all');
+			$totSize=(sizeof($stockgroupsIds->toArray()));
+			if($totSize==0){
+				$options[]=['text'=>$stockgroup->name,'value'=>$stockgroup->id];
+			}
+			
+		}
+		//pr($options);exit;
+        $shades = $this->Items->Shades->find('list')->where(['company_id'=>$company_id]);
+        $brands = $this->Items->Brands->find('list')->where(['company_id'=>$company_id]);
+        $sizes = $this->Items->Sizes->find('list')->where(['company_id'=>$company_id]);
+        $gstFigures = $this->Items->GstFigures->find('list')->where(['GstFigures.company_id'=>$company_id]);
+        $this->set(compact('item', 'units', 'stockGroups','sizes','shades','gstFigures','options','brands'));
+        $this->set('_serialize', ['item']);
+	}
 
     /**
      * Edit method
