@@ -50,7 +50,7 @@ class ItemsController extends AppController
             'contain' => ['Units', 'StockGroups'],
 			'limit' => 100
         ];
-        $items = $this->paginate($this->Items->find()->where(['Items.company_id'=>$company_id])->where([
+        $items = $this->paginate($this->Items->find()->where(['Items.company_id'=>$company_id,'sales_for'=>'offline'])->where([
 		'OR' => [
             'Items.name LIKE' => '%'.$search.'%',
 			//...
@@ -64,7 +64,9 @@ class ItemsController extends AppController
         $this->set(compact('items','search'));
         $this->set('_serialize', ['items']);
     }
-
+	
+	
+	 
     /**
      * View method
      *
@@ -163,6 +165,31 @@ class ItemsController extends AppController
         $this->set('_serialize', ['item']);
     }
 	
+	public function appIndex()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$company_id=$this->Auth->User('session_company_id');
+		$search=$this->request->query('search');
+		$this->paginate = [
+            'contain' => ['Units', 'StockGroups'],
+			'limit' => 100
+        ];
+        $items = $this->paginate($this->Items->find()->where(['Items.company_id'=>$company_id,'sales_for IN'=>['online/offline','online']])->where([
+		'OR' => [
+            'Items.name LIKE' => '%'.$search.'%',
+			//...
+			 'Items.item_code LIKE' => '%'.$search.'%',	
+			 //...
+			 'Items.hsn_code LIKE' => '%'.$search.'%',
+			 
+			'Units.name LIKE' => '%'.$search.'%'
+		 ]]));
+
+        $this->set(compact('items','search'));
+        $this->set('_serialize', ['items']);
+    }
+
+	
 	public function appAdd(){
 		
 		$this->viewBuilder()->layout('index_layout');
@@ -248,7 +275,7 @@ class ItemsController extends AppController
 				
                 $this->Flash->success(__('The item has been saved.'));
 
-                return $this->redirect(['action' => 'add']);
+                return $this->redirect(['action' => 'appAdd']);
             }
             $this->Flash->error(__('The item could not be saved. Please, try again.'));
         }
@@ -275,6 +302,137 @@ class ItemsController extends AppController
         $this->set(compact('item', 'units', 'stockGroups','sizes','shades','gstFigures','options','brands'));
         $this->set('_serialize', ['item']);
 	}
+	
+	
+	public function appEdit($id = null)
+    {
+		$this->viewBuilder()->layout('index_layout');
+        $item = $this->Items->get($id, [
+            'contain' => ['ItemLedgers' => function($q) {
+				return $q->where(['ItemLedgers.is_opening_balance'=>'yes']);
+			}]
+        ]);
+        $itemPurchaseData=$this->Items->ItemLedgers->find()->where(['item_id'=>$id,'status'=>'In','grn_id > '=>0])->select('rate')->first();
+        $itemPurchaseRate=@$itemPurchaseData->rate;
+		$company_id=$this->Auth->User('session_company_id');
+		$location_id = $this->Auth->User('session_location_id');
+		
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $item = $this->Items->patchEntity($item, $this->request->getData());
+			$image_url=$this->request->getData('image_url');
+			$image_url_exist=$this->request->getData('image_url_exist');
+			
+				if(!empty($image_url['tmp_name']))
+				{
+					$this->request->data['image_url']=$image_url;			 
+				}
+				else
+				{
+					if(!empty($this->request->data['image_url_exist']))
+					{
+						$item->image_url=$image_url_exist;	
+					}
+					else
+					{
+						$item->image_url='';
+					}
+				}
+			
+			
+			
+			$gst_type = $item->kind_of_gst;
+			if($gst_type=='fix')
+			{
+				$first_gst_figure_id        = $item->first_gst_figure_id;
+				$item->second_gst_figure_id = $first_gst_figure_id;
+				$item->gst_amount           = 0;
+			}
+			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
+			
+			if ($this->Items->save($item)) {
+				
+				
+				if(!empty($image_url['tmp_name'])){
+						$item_error=$image_url['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$image_url['type']);
+								$item_item_image='item'.time().'.'.$item_ext[1];
+							}
+						if(empty($files['error']))
+						{
+							$keyname = 'Item/'.$item->id.'/'.$item_item_image;
+							$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
+						}else{
+							if(!$this->request->data['image_url_exist'])
+							{
+								$this->AwsFile->deleteObjectFile($keyname,$this->bucketName,$keyname);
+							}
+						}
+					$query = $this->Items->query();
+					$query->update()
+					->set([
+						'image_url' => $keyname
+						])
+					->where(['id' => $item->id])
+					->execute();
+				}
+				
+				
+				
+				
+				if($item->quantity>0)
+				{
+					$transaction_date=$this->Auth->User('session_company')->books_beginning_from;
+					$query_delete = $this->Items->ItemLedgers->query();
+						$query_delete->delete()
+						->where(['item_id' => $id,'is_opening_balance'=>'yes','company_id'=>$company_id])
+						->execute();
+						
+					$itemLedger = $this->Items->ItemLedgers->newEntity();
+					$itemLedger->item_id            = $item->id;
+					$itemLedger->transaction_date   = date("Y-m-d",strtotime($transaction_date));
+					$itemLedger->quantity           = $this->request->data['quantity'];
+					$itemLedger->rate               = $this->request->data['rate'];
+					$itemLedger->amount             = $this->request->data['amount'];
+					$itemLedger->status             = 'in';
+					$itemLedger->is_opening_balance = 'yes';
+					$itemLedger->company_id         = $company_id;
+					$itemLedger->location_id        = $location_id;
+					$this->Items->ItemLedgers->save($itemLedger);
+				}
+				$this->Flash->success(__('The item has been saved.'));
+				
+
+                return $this->redirect(['action' => 'appIndex']);
+            }
+			else
+			{ 
+				$this->Flash->error(__('The item could not be saved. Please, try again.'));
+			}
+        }
+        $units = $this->Items->Units->find('list')->where(['company_id'=>$company_id]);
+         $stockGroups = $this->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']);
+		
+		$options=[];
+		$totSize=0;
+		foreach($stockGroups as $stockgroup){
+			$stockgroupsIds = $this->Items->StockGroups
+							->find('children', ['for' => $stockgroup->id])
+							->find('all');
+			$totSize=(sizeof($stockgroupsIds->toArray()));
+			if($totSize==0){
+				$options[]=['text'=>$stockgroup->name,'value'=>$stockgroup->id];
+			}
+			
+		}
+		 $brands = $this->Items->AppBrands->find('list')->where(['status'=>'Active']);
+		$shades = $this->Items->Shades->find('list')->where(['company_id'=>$company_id]);
+        $sizes = $this->Items->Sizes->find('list')->where(['company_id'=>$company_id]);
+		$gstFigures = $this->Items->GstFigures->find('list')->where(['GstFigures.company_id'=>$company_id]);
+        $this->set(compact('item', 'units', 'stockGroups','sizes','shades','gstFigures','itemPurchaseRate','options','brands'));
+        $this->set('_serialize', ['item']);
+    }
 
     /**
      * Edit method

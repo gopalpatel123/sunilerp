@@ -18,7 +18,7 @@
 									<?php echo $this->Form->control('name',['class'=>'form-control input-sm','placeholder'=>'Name','label'=>false,'autofocus']); ?>
 								</div>
 								<div class="form-group">
-									<label>Discount</label>
+									<label>Discount </label>
 									<?php echo $this->Form->control('discount',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'discount']); ?>
 								</div>
 								<div class="form-group">

@@ -41,7 +41,7 @@ $this->set('title', 'App Master Setup');
 							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/Items/appAdd',['escape' => false, 'class'=>'list-group-item']); ?>
 							<?php }?>
 							<?php if (in_array("59", $userPages)){?>
-							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-list-ul menuCss']).' List', '/Items',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-list-ul menuCss']).' List', '/Items/appIndex',['escape' => false, 'class'=>'list-group-item']); ?>
 							<?php }?>
 						</div>
 					</div>
