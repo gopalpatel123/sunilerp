@@ -636,6 +636,36 @@ class ItemsController extends AppController
         $this->set('_serialize', ['items']);
 	}
 
+	 public function getItems($id = null)
+    { 
+		$this->viewBuilder()->layout('');
+		$company_id=$this->Auth->User('session_company_id');
+        //$stockGroup = $this->StockGroups->get($id);
+		$itemDatas=$this->Items->find('list')->where(['Items.company_id'=>$company_id,'Items.stock_group_id' => $id]); //pr($stockSubgroups); exit;
+		$this->set(compact('itemDatas'));
+    } 
+	
+	public function getEditItems($id = null)
+    { 
+		$this->viewBuilder()->layout('');
+		$company_id=$this->Auth->User('session_company_id');
+        //$stockGroup = $this->StockGroups->get($id);
+		$item_id=$this->request->query('item_id');
+		
+		$Items=$this->Items->find()->where(['Items.company_id'=>$company_id,'Items.id' => $item_id]); 
+		$options=[];
+		foreach($Items as $item){ 
+			if($item->id == $item_id){
+				$value=$item->id;
+			}
+				$options[]=['text'=>$item->name,'value'=>$item->id];
+			
+			
+		}
+		//pr($options); exit;
+		$this->set(compact('options','value'));
+    } 
+	
 	public function getItem()
 	{
 		$item_code = $this->request->getData('barcode');
