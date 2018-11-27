@@ -363,11 +363,7 @@ class ItemsController extends AppController
 						{
 							$keyname = 'Item/'.$item->id.'/'.$item_item_image;
 							$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
-						}else{
-							if(!$this->request->data['image_url_exist'])
-							{
-								$this->AwsFile->deleteObjectFile($keyname,$this->bucketName,$keyname);
-							}
+							$this->AwsFile->deleteMatchingObjects($image_url_exist);
 						}
 					$query = $this->Items->query();
 					$query->update()

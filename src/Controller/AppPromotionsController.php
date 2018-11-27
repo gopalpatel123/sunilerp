@@ -92,7 +92,7 @@ class AppPromotionsController extends AppController
 			
 		}
 		
-		 $Items = $this->AppPromotions->AppPromotionDetails->Items->find('list')->where(['company_id'=>$company_id,'Items.sales_for IN'=>['online','online/offline']]);
+		 $Items = $this->AppPromotions->AppPromotionDetails->Items->find('list')->where(['company_id'=>$company_id,'Items.sales_for IN'=>['online','online/offline','promo_is_applicable'=>'Yes']]);
 		
         $this->set(compact('appPromotion','options','Items'));
         $this->set('_serialize', ['appPromotion']);

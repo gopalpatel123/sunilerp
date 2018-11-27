@@ -12,6 +12,13 @@ $this->set('title', 'Items');
 					<i class="icon-bar-chart font-green-sharp hide"></i>
 					<span class="caption-subject font-green-sharp bold ">Stock Items</span>
 				</div>
+				<div class="pull-right">
+					<div class="row">	
+						<div class="col-md-12">	
+							<a href="<?php echo $this->url->build(['action'=>'appAdd']) ?>" target="_blank"><button type="submit" class="go btn blue-madison input-sm" style="margin-bottom: -20px;">Add</button></a>
+						</div>
+					</div>		
+				</div>
 				<div class="actions">
 					<form method="GET" id="">
 						<div class="row">
@@ -25,6 +32,7 @@ $this->set('title', 'Items');
 						</div>
 					</form>
 				</div>
+				
 			</div>
 			<div class="portlet-body">
 				<div class="table-responsive">
