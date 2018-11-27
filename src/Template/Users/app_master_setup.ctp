@@ -61,27 +61,75 @@ $this->set('title', 'App Master Setup');
 						</div>
 					</div>
 					<?php }?>
+					
 					<?php
-					$target=array("93");
+					$target=array("100","101");
 					if(!empty(count(array_intersect($userPages, $target)))){?>
-					<div class="col-md-2">
-						<span class="caption-subject bold ">Delivery Charges</span>
+					<div class="col-md-4">
+						<span class="caption-subject bold ">Banners</span>
 						<div class="list-group">
-						<?php if (in_array("93", $userPages)){?>
-							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Delivery Charges', '/DeliveryCharges/',['escape' => false, 'class'=>'list-group-item']); ?>
+						<?php if (in_array("100", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/AppBanners/add',['escape' => false, 'class'=>'list-group-item']); ?>
 							<?php }?>
-							
+						<?php if (in_array("101", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' List', '/AppBanners/',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>	
+						</div>
+					</div>
+					<?php }?>
+					<?php
+					$target=array("99","98");
+					if(!empty(count(array_intersect($userPages, $target)))){?>
+					<div class="col-md-4">
+						<span class="caption-subject bold ">Promotion</span>
+						<div class="list-group">
+						<?php if (in_array("98", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/AppPromotions/add',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>
+						<?php if (in_array("99", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' List', '/AppPromotions/',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>	
+						</div>
+					</div>
+					<?php }?>
+					<?php
+					$target=array("103","104");
+					if(!empty(count(array_intersect($userPages, $target)))){?>
+					<div class="col-md-4">
+						<span class="caption-subject bold ">Menus</span>
+						<div class="list-group">
+						<?php if (in_array("104", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/AppMenus/add',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>
+						<?php if (in_array("103", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' List', '/AppMenus/',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>	
+						</div>
+					</div>
+					<?php }?>
+					<?php
+					$target=array("106","107");
+					if(!empty(count(array_intersect($userPages, $target)))){?>
+					<div class="col-md-4">
+						<span class="caption-subject bold ">Brands</span>
+						<div class="list-group">
+						<?php if (in_array("107", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Create', '/AppBrands/add',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>
+						<?php if (in_array("106", $userPages)){?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' List', '/AppBrands/',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php }?>	
 						</div>
 					</div>
 					<?php }?>
 					<?php
 					$target=array("93");
 					if(!empty(count(array_intersect($userPages, $target)))){?>
-					<div class="col-md-2">
-						<span class="caption-subject bold ">Banners</span>
+					<div class="col-md-4">
+						<span class="caption-subject bold ">Delivery Charges</span>
 						<div class="list-group">
 						<?php if (in_array("93", $userPages)){?>
-							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Banners', '/AppBanners/',['escape' => false, 'class'=>'list-group-item']); ?>
+							<?php echo $this->Html->link($this->Html->tag('i', '', ['class' => 'fa fa-plus-square menuCss']).' Delivery Charges', '/DeliveryCharges/',['escape' => false, 'class'=>'list-group-item']); ?>
 							<?php }?>
 							
 						</div>
