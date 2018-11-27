@@ -117,8 +117,16 @@ $this->set('title', 'Edit App Home Screen');
 						<div class="row">
 							<div class="col-md-12">
 								<div class="form-group">
-								<?= $this->Html->image('/img/download.png',['class'=>'img-responsive thumbnail','style'=>'height: 98px;','id'=>'imgshw1'])?>
-										
+								<?php 
+								
+								if(!empty($appHomeScreen->image)){
+									$result=$awsFileLoad->cdnpath();
+									echo $this->Html->image($result.'/'.$appHomeScreen->image,['class'=>'img-responsive thumbnail','style'=>'height: 98px;','id'=>'imgshw1']);
+									
+									echo $this->Form->control('image_exist',['class'=>'form-control input-sm','label'=>false, 'type' =>'hidden','value'=>$appHomeScreen->image]);
+								}else{  ?>
+									<?= $this->Html->image('/img/download.png',['class'=>'img-responsive thumbnail','style'=>'height: 98px;','id'=>'imgshw1'])?>
+								<?php } ?>	
 								</div>
 							</div>
 						</div>
@@ -214,7 +222,7 @@ $this->set('title', 'Edit App Home Screen');
 	  
     $(".image").change(function(){
 
-   var fup = document.getElementById("stock_group_image");
+   var fup = document.getElementById("image");
 	var fileName = fup.value;
 	var ext = fileName.substring(fileName.lastIndexOf(".") + 1);
 	if(ext == "jpg" || ext == "jpeg" || ext == "png")

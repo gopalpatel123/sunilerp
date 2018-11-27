@@ -67,8 +67,29 @@ class AppHomeScreensController extends AppController
 		$company_id=$this->Auth->User('session_company_id');
         if ($this->request->is('post')) {
             $appHomeScreen = $this->AppHomeScreens->patchEntity($appHomeScreen, $this->request->getData());
+			$image=$this->request->getData('image');
 			//pr($appHomeScreen);exit;
             if ($this->AppHomeScreens->save($appHomeScreen)) {
+				
+				if(!empty($image['tmp_name'])){
+						$item_error=$image['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$image['type']);
+								$item_item_image='homescreen'.time().'.'.$item_ext[1];
+							}
+				
+						$keyname = 'Homescreen/'.$appHomeScreen->id.'/'.$item_item_image;
+						$this->AwsFile->putObjectFile($keyname,$image['tmp_name'],$image['type']);
+				
+					$query = $this->AppHomeScreens->query();
+					$query->update()
+					->set([
+						'image' => $keyname
+						])
+					->where(['id' => $appHomeScreen->id])
+					->execute();
+				}
                 $this->Flash->success(__('The app home screen has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
@@ -97,7 +118,49 @@ class AppHomeScreensController extends AppController
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $appHomeScreen = $this->AppHomeScreens->patchEntity($appHomeScreen, $this->request->getData());
+			
+			$image=$this->request->getData('image');
+			$image_exist=$this->request->getData('image_exist');
+			
+				if(!empty($image['tmp_name']))
+				{
+					$this->request->data['image']=$image;			 
+				}
+				else
+				{
+					if(!empty($this->request->data['image_exist']))
+					{
+						$item->image=$image_exist;	
+					}
+					else
+					{
+						$item->image='';
+					}
+				}
+				//pr($appHomeScreen);exit;
             if ($this->AppHomeScreens->save($appHomeScreen)) {
+				
+				if(!empty($image['tmp_name'])){
+						$item_error=$image['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$image['type']);
+								$item_item_image='homescreen'.time().'.'.$item_ext[1];
+							}
+						if(empty($files['error']))
+						{
+							$keyname = 'Homescreen/'.$appHomeScreen->id.'/'.$item_item_image;
+							$this->AwsFile->putObjectFile($keyname,$image['tmp_name'],$image['type']);
+							$this->AwsFile->deleteMatchingObjects($image_exist);
+						}
+					$query = $this->AppHomeScreens->query();
+					$query->update()
+					->set([
+						'image' => $keyname
+						])
+					->where(['id' => $appHomeScreen->id])
+					->execute();
+				}
                 $this->Flash->success(__('The app home screen has been saved.'));
 
                 return $this->redirect(['action' => 'index']);

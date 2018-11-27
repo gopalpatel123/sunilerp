@@ -131,7 +131,7 @@ class AppBrandsController extends AppController
 				
 						$keyname = 'Brand/'.$appBrand->id.'/'.$item_item_image;
 						$this->AwsFile->putObjectFile($keyname,$brand_image['tmp_name'],$brand_image['type']);
-				
+						$this->AwsFile->deleteMatchingObjects($old_brand_image);
 					$query = $this->AppBrands->query();
 					$query->update()
 					->set([

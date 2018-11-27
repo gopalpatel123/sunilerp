@@ -88,7 +88,7 @@ $this->set('title', 'Create App Home Screen');
 									<label>Model Name</label>
 									<?php 
 									$model_name=[];
-									$model_name=[['text'=>'Brands','value'=>'Brands'],['text'=>'Category','value'=>'Category']];
+									$model_name=[['text'=>'Brands','value'=>'Brands'],['text'=>'Banner','value'=>'Banner'],['text'=>'Category','value'=>'Category']];
 									
 									echo $this->Form->control('model_name',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Screen Type-', 'options' => $model_name]); ?>
 								</div>

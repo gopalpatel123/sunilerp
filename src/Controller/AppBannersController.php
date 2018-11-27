@@ -180,11 +180,7 @@ class AppBannersController extends AppController
 						{
 							$keyname = 'Banner/'.$appBanner->id.'/'.$item_item_image;
 							$this->AwsFile->putObjectFile($keyname,$banner_image['tmp_name'],$banner_image['type']);
-						}else{
-							if(!$this->request->data['banner_image_exist'])
-							{
-								$this->AwsFile->deleteObjectFile($keyname,$this->bucketName,$keyname);
-							}
+							$this->AwsFile->deleteObjectFile($banner_image_exist);
 						}
 					$query = $this->AppBanners->query();
 					$query->update()
