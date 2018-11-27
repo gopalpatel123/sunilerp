@@ -2,7 +2,7 @@
 /**
  * @Author: PHP Poets IT Solutions Pvt. Ltd.
  */
-$this->set('title', 'Stock Groups');
+$this->set('title', 'App Promotions');
 ?>
 <div class="row">
 	<div class="col-md-12">
@@ -10,7 +10,7 @@ $this->set('title', 'Stock Groups');
 			<div class="portlet-title">
 				<div class="caption">
 					<i class="icon-bar-chart font-green-sharp hide"></i>
-					<span class="caption-subject font-green-sharp bold ">Stock Groups</span>
+					<span class="caption-subject font-green-sharp bold ">App Promotions</span>
 				</div>
 				<div class="actions">
 					<form method="GET" id="">
@@ -27,27 +27,35 @@ $this->set('title', 'Stock Groups');
 				</div>
 			</div>
 			<div class="portlet-body">
-			<?php $page_no=$this->Paginator->current('StockGroups');
+			<?php $page_no=$this->Paginator->current('appPromotions');
 					 $page_no=($page_no-1)*100; 
 									?>				
 				<table class="table table-condensed table-hover table-bordered">
 					<thead>
 						<tr>
 							<th scope="col"><?= $this->Paginator->sort('Sr') ?></th>
-							<th scope="col"><?= $this->Paginator->sort('name') ?></th>
-							<th scope="col"><?= $this->Paginator->sort('parent_id') ?></th>
+							<th scope="col"><?= $this->Paginator->sort('Offer Name') ?></th>
+							<th scope="col"><?= $this->Paginator->sort('Start Date') ?></th>
+							<th scope="col"><?= $this->Paginator->sort('End Date') ?></th>
+							<th scope="col"><?= $this->Paginator->sort('Status') ?></th>
 							<th scope="col" class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ($stockGroups as $stockGroup): ?>
+						<?php foreach ($appPromotions as $apppromotion): ?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
-							<td><?= h($stockGroup->name) ?></td>
-							<td><?= $stockGroup->has('parent_stock_group') ? $this->Html->link($stockGroup->parent_stock_group->name, ['controller' => 'StockGroups', 'action' => 'view', $stockGroup->parent_stock_group->id]) : '' ?></td>
+							<td><?= h($apppromotion->offer_name) ?></td>
+							<td><?= h(date('d-m-Y',strtotime($apppromotion->start_date)))?></td>
+							<td><?= h(date('d-m-Y',strtotime($apppromotion->end_date)))?></td>
+							<td><?= h($apppromotion->status) ?></td>
 							<td class="actions">
 							<?php if (in_array("57", $userPages)){?>
-								<?= $this->Html->link(__('Edit'), ['action' => 'edit', $stockGroup->id]) ?>
+								<?= $this->Html->link(__('View'), ['action' => 'view', $apppromotion->id]) ?>
+								<?php }?>
+							<?php if (in_array("57", $userPages)){?>
+								<?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $apppromotion->id], ['confirm' => __('Are you sure you want to delete # {0}?', $apppromotion->id)]) ?>
+								
 								<?php }?>
 							</td>
 						</tr>

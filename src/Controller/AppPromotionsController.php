@@ -21,9 +21,16 @@ class AppPromotionsController extends AppController
     public function index()
     {
 		$this->viewBuilder()->layout('index_layout');
-        $appPromotions = $this->paginate($this->AppPromotions);
+		$search=$this->request->query('search');
+        $appPromotions = $this->paginate($this->AppPromotions->find()->contain(['AppPromotionDetails'])->where([
+		'OR' => [
+            'AppPromotions.offer_name LIKE' => '%'.$search.'%',
+			//...
+			 'AppPromotions.status LIKE' => '%'.$search.'%',	
+			
+		 ]]));
 
-        $this->set(compact('appPromotions'));
+        $this->set(compact('appPromotions','search'));
         $this->set('_serialize', ['appPromotions']);
     }
 
@@ -36,8 +43,9 @@ class AppPromotionsController extends AppController
      */
     public function view($id = null)
     {
+		$this->viewBuilder()->layout('index_layout');
         $appPromotion = $this->AppPromotions->get($id, [
-            'contain' => ['AppPromotionDetails']
+            'contain' => ['AppPromotionDetails'=>['StockGroups','Items']]
         ]);
 
         $this->set('appPromotion', $appPromotion);
