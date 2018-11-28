@@ -55,6 +55,31 @@ class AppCustomersController extends AppController
 
 	}
 	
+	public function sociallogin(){
+		
+		$email=@$this->request->query['email'];
+		$AppCustomers=[];
+		if(!empty($email)){
+			
+			$exists_email = $this->AppCustomers->exists(['AppCustomers.email'=>$email]);
+			
+			if($exists_email==1){
+				$AppCustomers=$this->AppCustomers->find()->where(['AppCustomers.email'=>$email])->first();
+				$success = true;
+				$message = 'data found successfully';
+			}else{
+				$success = false;
+				$message = 'Email is not exits';
+			}
+			
+		}else{
+			$success = false;
+		    $message = 'empty email';
+		}
+		
+			$this->set(compact(['AppCustomers','success','message']));
+			$this->set('_serialize', ['success','message','AppCustomers']);
+	}
 	
 	
 	 public function login()
@@ -79,7 +104,7 @@ class AppCustomersController extends AppController
 					$this->request->data['username']=$this->request->getData('email');
 					$this->request->data['mobile_verify']='Yes';
 					$appCustomer = $this->AppCustomers->patchEntity($appCustomer, $this->request->getData());
-					if ($this->AppCustomers->save($appCustomer)) {
+					if($this->AppCustomers->save($appCustomer)) {
 						$item_error=@$image_url['error'];
 						if(!empty(@$image_url['tmp_name'])){
 							if(empty($item_error))
@@ -88,12 +113,15 @@ class AppCustomersController extends AppController
 								$item_item_image='customer'.time().'.'.$item_ext[1];
 								$keyname = 'Appcustomer/'.$appCustomer->id.'/'.$item_item_image;
 								$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
+								$AppCustomersdata=$this->AppCustomers->get($appCustomer->id);
+								$AppCustomersdata->image_url=$keyname;
+								$this->AppCustomers->save($AppCustomersdata);
 								
 							}
 						}
 						$success = true;
 						$message = "The customer has been saved."; 
-						$AppCustomers=$appCustomer;
+						$AppCustomers=$this->AppCustomers->get($appCustomer->id);
 					}else{
 						$success = false;
 						$message = "The customer could not be saved. Please, try again"; 
