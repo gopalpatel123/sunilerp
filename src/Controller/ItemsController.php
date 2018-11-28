@@ -322,6 +322,7 @@ class ItemsController extends AppController
 			$image_url=$this->request->getData('image_url');
 			$image_url_exist=$this->request->getData('image_url_exist');
 			
+			
 				if(!empty($image_url['tmp_name']))
 				{
 					$this->request->data['image_url']=$image_url;			 

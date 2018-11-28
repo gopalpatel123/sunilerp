@@ -45,6 +45,9 @@ class AppController extends Controller
         $this->loadComponent('RequestHandler', [
             'enableBeforeRedirect' => false,
         ]);
+		 $this->loadComponent('AwsFile');
+         $this->loadComponent('Sms');
+		
         $this->loadComponent('Flash');
 		 $this->loadComponent('Crud.Crud', [
             'actions' => [

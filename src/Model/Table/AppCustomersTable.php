@@ -59,6 +59,8 @@ class AppCustomersTable extends Table
         $this->hasMany('ItemReviewRatings', [
             'foreignKey' => 'app_customer_id'
         ]);
+		
+		  $this->belongsTo('VerifyOtps');
     }
 
     /**
@@ -79,8 +81,8 @@ class AppCustomersTable extends Table
 
         $validator
             ->requirePresence('mobile', 'create')
-            ->notEmpty('mobile')
-            ->add('mobile', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->notEmpty('mobile');
+           // ->add('mobile', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
         $validator
             ->email('email')
@@ -88,19 +90,13 @@ class AppCustomersTable extends Table
             ->notEmpty('email')
             ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
 
-        $validator
-            ->requirePresence('username', 'create')
-            ->notEmpty('username');
-
-        $validator
-            ->requirePresence('password', 'create')
-            ->notEmpty('password');
+      
 
         $validator
             ->requirePresence('otp', 'create')
             ->notEmpty('otp');
 
-        $validator
+       /*  $validator
             ->dateTime('created_on')
             ->requirePresence('created_on', 'create')
             ->notEmpty('created_on');
@@ -128,6 +124,14 @@ class AppCustomersTable extends Table
         $validator
             ->requirePresence('social_image', 'create')
             ->notEmpty('social_image');
+			
+	    $validator
+            ->requirePresence('username', 'create')
+            ->notEmpty('username');
+
+        $validator
+            ->requirePresence('password', 'create')
+            ->notEmpty('password'); */
 
         return $validator;
     }
@@ -142,8 +146,8 @@ class AppCustomersTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->isUnique(['email']));
-        $rules->add($rules->isUnique(['username']));
-        $rules->add($rules->isUnique(['mobile']));
+       // $rules->add($rules->isUnique(['username']));
+        //$rules->add($rules->isUnique(['mobile']));
 
         return $rules;
     }
