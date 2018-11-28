@@ -40,7 +40,7 @@ $this->set('title', 'App Menus');
 							<td><?= h(++$i) ?></td>
 							<td><?= h($appMenu->name) ?></td>
 							<td><?= h($appMenu->link) ?></td>
-							 <td><?= $appMenu->has('parent_app_menu') ? $this->Html->link($appMenu->parent_app_menu->name, ['controller' => 'AppMenus', 'action' => 'view', $appMenu->parent_app_menu->id]) : '' ?></td>
+							 <td><?= $appMenu->has('parent_app_menu') ? $appMenu->parent_app_menu->name : '' ?></td>
 							<td><?= h($appMenu->title_content) ?></td>
 							<td class="actions">
 								

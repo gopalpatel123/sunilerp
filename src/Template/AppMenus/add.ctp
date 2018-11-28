@@ -34,7 +34,11 @@ $this->set('title', 'Create App Menu');
 								</div>
 								<div class="form-group">
 									<label>Status  <span class="required"></span></label>
-									<?php echo $this->Form->control('status',['class'=>'form-control input-sm gst','label'=>false]); ?>
+										<?php 
+										$status=[];
+										$status=[['text'=>'Active','value'=>'Active'],['text'=>'Deactivate','value'=>'Deactivate']];
+										
+										echo $this->Form->control('status',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Status-', 'options' => $status]); ?>
 									
 								</div>
 								
