@@ -21,6 +21,7 @@ class AppCustomersController extends AppController
 	 public function initialize()
     {
         parent::initialize();
+        $this->Auth->allow(['login','send_otp','sociallogin','signup']);
     }
 	
 	public function send_otp(){
