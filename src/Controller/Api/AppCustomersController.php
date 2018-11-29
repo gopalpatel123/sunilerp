@@ -1,10 +1,12 @@
 <?php
 namespace App\Controller\Api;
+
 use Cake\Event\Event;
 use Cake\Network\Exception\UnauthorizedException;
 use Cake\Utility\Security;
 use Firebase\JWT\JWT;
 use Cake\Validation\Validation;
+use Cake\Auth\DefaultPasswordHasher;
 
 /**
  * AppCustomers Controller
@@ -19,7 +21,6 @@ class AppCustomersController extends AppController
 	 public function initialize()
     {
         parent::initialize();
-       // $this->Auth->allow(['add']);
     }
 	
 	public function send_otp(){
@@ -84,12 +85,42 @@ class AppCustomersController extends AppController
 	
 	 public function login()
 		{
-		  
-			$success = true;
-			$message = "User found successfully"; 
+			$username=$this->request->data['username'];
+			$password=$this->request->data['password'];
+			$this->Auth->config('authenticate', [
+				'Form' => [
+				'fields' => ['username' => 'email'],
+				  'userModel' => 'AppCustomers'
+				]
+			]);
+			$this->Auth->constructAuthenticate();
+                $this->request->data['email'] = $this->request->data['username'];
+                unset($this->request->data['username']);
+
+			$AppCustomers=[];
+			$user = $this->Auth->identify();
 			
-			$this->set(compact(['response','success','message']));
-			$this->set('_serialize', ['success','message','response']);
+			if(!empty($username) and !empty($password)){
+				 //$user = $this->Auth->identify();
+				if($user){
+					$AppCustomers=$user;
+					$success = true;
+				    $message = "data found successfully"; 
+			
+				}else{
+					
+					$success = false;
+					$message = "Invaild username or password"; 
+			
+				}
+				
+			}else{
+				$success = false;
+				$message = "Empty username or password"; 
+			}
+			
+			$this->set(compact(['AppCustomers','success','message']));
+			$this->set('_serialize', ['success','message','AppCustomers']);
 		}
 		
 		
