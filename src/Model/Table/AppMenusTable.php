@@ -49,6 +49,13 @@ class AppMenusTable extends Table
             'className' => 'AppMenus',
             'foreignKey' => 'parent_id'
         ]);
+		
+		 $this->belongsTo('ParentStockGroups', [
+            'className' => 'StockGroups',
+            'foreignKey' => 'stock_group_id'
+        ]);
+		
+		 $this->belongsTo('StockGroups');
     }
 
     /**

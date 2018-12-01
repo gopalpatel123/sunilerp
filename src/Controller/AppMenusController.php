@@ -71,7 +71,8 @@ class AppMenusController extends AppController
             $this->Flash->error(__('The app menu could not be saved. Please, try again.'));
         }
         $parentAppMenus = $this->AppMenus->ParentAppMenus->find('list', ['limit' => 200]);
-        $this->set(compact('appMenu', 'parentAppMenus'));
+        $parentStockGroups = $this->AppMenus->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app']);
+        $this->set(compact('appMenu', 'parentAppMenus','parentStockGroups'));
         $this->set('_serialize', ['appMenu']);
     }
 
@@ -99,7 +100,8 @@ class AppMenusController extends AppController
             $this->Flash->error(__('The app menu could not be saved. Please, try again.'));
         }
         $parentAppMenus = $this->AppMenus->ParentAppMenus->find('list', ['limit' => 200]);
-        $this->set(compact('appMenu', 'parentAppMenus'));
+		$parentStockGroups = $this->AppMenus->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app']);
+        $this->set(compact('appMenu', 'parentAppMenus','parentStockGroups'));
         $this->set('_serialize', ['appMenu']);
     }
 

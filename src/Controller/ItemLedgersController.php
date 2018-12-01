@@ -165,6 +165,47 @@ class ItemLedgersController extends AppController
 		$session_location_id =$this->Auth->User('session_location_id');
 		$stock_group_id = $this->request->query('stock_group_id');
 		$stock_sub_group_id = $this->request->query('stock_subgroup_id');
+		$first_time="Yes";
+		
+		$where=[];
+		if(empty($total)){ 
+			$total='All';
+			
+		}
+		if(!empty($stock_sub_group_id)){
+			$first_time="No";
+			$where['Items.stock_group_id']=$stock_sub_group_id;
+		}
+		$to_date   = $this->request->query('to_date');
+		if(!empty($to_date)){  
+			$first_time="No";
+			$to_date   = date("Y-m-d",strtotime($to_date));
+		}
+		else{
+			$to_date   = date("Y-m-d");
+		}
+		
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		
+		//pr($remaining); exit;
+		$companies=$this->ItemLedgers->Companies->find()->contain(['States'])->where(['Companies.id'=>$company_id])->first();
+	
+		$stockGroups = $this->ItemLedgers->Items->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id,'StockGroups.parent_id IS NULL']);
+		$stockSubgroups=$this->ItemLedgers->Items->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id]);
+        $this->set(compact('companies','status','url','stockGroups','unit_rate','remaining','Items','stockGroups','to_date','stockSubgroups','stock_sub_group_id','stock_group_id','total','first_time'));
+        $this->set('_serialize', ['itemLedgers']);
+    }
+	
+	public function getStocks(){
+		 $this->viewBuilder()->layout('');
+		$status=$this->request->query('status'); 
+		$total=$this->request->query('total'); 
+		 
+		$company_id=$this->Auth->User('session_company_id');
+		$session_location_id =$this->Auth->User('session_location_id');
+		$stock_group_id = $this->request->query('stock_group_id');
+		$stock_sub_group_id = $this->request->query('stock_subgroup_id');
 		
 		$first_time="Yes";
 		
@@ -200,7 +241,7 @@ class ItemLedgersController extends AppController
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
 		//$x=['6176','6177','6173','6172','6174','6178','6179','6180','6025'];
-		if($first_time=="No"){ 
+		//if($first_time=="No"){ 
 			$Items=$this->ItemLedgers->Items->find()->contain(['Shades','Sizes','StockGroups'=>['ParentStockGroups']])->where($where)->where(['Items.company_id'=>$company_id ,'Items.created_on <='=>$to_date]); 
 			//pr($Items->toArray());exit;
 			$remaining=[];$unit_rate=[];$stock=[];
@@ -250,7 +291,7 @@ class ItemLedgersController extends AppController
 				//	pr($remaining); 
 				}	
 			} 
-		}
+		//}
 		//pr($remaining); exit;
 		$companies=$this->ItemLedgers->Companies->find()->contain(['States'])->where(['Companies.id'=>$company_id])->first();
 	
@@ -258,7 +299,8 @@ class ItemLedgersController extends AppController
 		$stockSubgroups=$this->ItemLedgers->Items->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id]);
         $this->set(compact('companies','status','url','stockGroups','unit_rate','remaining','Items','stockGroups','to_date','stockSubgroups','stock_sub_group_id','stock_group_id','total','first_time'));
         $this->set('_serialize', ['itemLedgers']);
-    }
+	}
+	
 	
 	public function itemStockFinish()
     {

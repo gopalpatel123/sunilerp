@@ -40,6 +40,7 @@ class AppHomeScreensTable extends Table
             'foreignKey' => 'stock_group_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('AppBrands');
     }
 
     /**

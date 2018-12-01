@@ -131,6 +131,7 @@ class AppCartController extends AppController
         $appCart = $this->AppCart->newEntity();
         if ($this->request->is('post')) {
             $appCart = $this->AppCart->patchEntity($appCart, $this->request->getData());
+			pr($appCart);exit;	
             if ($this->AppCart->save($appCart)) {
                 $success = true;
                 $message = "Item Added";
@@ -186,8 +187,8 @@ class AppCartController extends AppController
         //pr($this->AppCart); exit;
         $app_carts = $this->AppCart->find()->select($this->AppCart)
                     ->select(['item'=>'Items.name','price'=>'AppCart.price','gst_figure_id'=>'Items.gst_figure_id','kind_of_gst'=>'Items.kind_of_gst','first_gst_figure_id'=>'Items.first_gst_figure_id','second_gst_figure_id'=>'Items.second_gst_figure_id'])
-        ->where(['AppCart.user_id'=>$user_id])->contain(['Items'])->toArray();
-       // pr($app_carts); exit;
+        ->where(['AppCart.user_id'=>$user_id])->contain(['Items'=>['Shades']])->toArray();
+        //pr($app_carts); exit;
         if(!empty($app_carts))
         {
 		$company_id=@(int)$app_carts[0]['company_id'];
@@ -299,10 +300,15 @@ class AppCartController extends AppController
 					//pr($amount-$gst_rate); pr($gst_rate); pr($amount);
 				}
 			}else{
-					$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->first_gst_figure_id);
+					//$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->first_gst_figure_id);
 					if($app_cart->discount==0){
 						
 						$newPrice=$app_cart->price;
+						if($newPrice < 1050){
+							$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->first_gst_figure_id);
+						}else if($newPrice >= 1050){
+							$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->second_gst_figure_id);
+						}
 						$tax_percentage=($GstFig->tax_percentage);
 						$x=100+$GstFig->tax_percentage;
 						//$gst_rate=($newPrice*$tax_percentage)/$x;
@@ -317,6 +323,11 @@ class AppCartController extends AppController
 						$dis=($app_cart->price*$app_cart->discount)/100;
 						$total_discount+=$dis;
 						$newPrice=$app_cart->price-$dis;
+						if($newPrice < 1050){
+							$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->first_gst_figure_id);
+						}else if($newPrice >= 1050){
+							$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->second_gst_figure_id);
+						}
 						$tax_percentage=($GstFig->tax_percentage);
 						$x=100+$GstFig->tax_percentage;
 						$amount=$newPrice*$app_cart->quantity;
@@ -449,7 +460,7 @@ class AppCartController extends AppController
 		//exit;
 		//pr(@$SalesInvoiceData->id); exit;
 		$salesInvoice = $this->AppCart->SalesInvoices->get(@$SalesInvoiceData->id, [
-            'contain' => ['Companies','SalesInvoiceRows'=>['Items']]
+            'contain' => ['Companies','SalesInvoiceRows'=>['Items'=>['Shades','Sizes']]]
         ]);
 		//exit;
 		 //pr($net_total); 

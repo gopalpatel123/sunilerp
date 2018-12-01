@@ -29,7 +29,8 @@ $this->set('title', 'Create App Home Screen');
 									<label>Layout</label>
 									<?php 
 									$layout=[];
-									$layout=[['text'=>'Single Image','value'=>'single image'],['text'=>'Horizontal','value'=>'horizontal'],['text'=>'Banner','value'=>'banner'],['text'=>'Brand Layout','value'=>'brand layout'],['text'=>'2-Image Layout','value'=>'2-image layout'],['text'=>'3-Image Layout','value'=>'3-image layout',['text'=>'4-Image Layout','value'=>'4-image layout']]];
+									$layout=[['text'=>'Single Image','value'=>'single image'],['text'=>'Horizontal','value'=>'horizontal'],['text'=>'Banner','value'=>'banner'],['text'=>'Brand Layout','value'=>'brand layout'],['text'=>'2-Image Layout','value'=>'2-image layout'],['text'=>'3-Image Layout','value'=>'3-image layout'],['text'=>'4-Image Layout','value'=>'4-image layout'],
+									['text'=>'Category','value'=>'category']];
 									
 									echo $this->Form->control('layout',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Layout-', 'options' => $layout]); ?>
 								</div>

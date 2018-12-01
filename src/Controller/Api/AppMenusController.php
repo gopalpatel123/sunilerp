@@ -12,10 +12,24 @@ class AppMenusController extends AppController
 	 public function getAppMenus()
     {
 
-		$AppMenus = $this->AppMenus->find()->where(['AppMenus.status'=>'Active'])->contain(['ParentAppMenus','ChildAppMenus'])->order(['AppMenus.id'=>'ASC']);
+		$AppMenusDatas = $this->AppMenus->find()->where(['AppMenus.status'=>'Active'])
+						->contain(['ParentStockGroups'=>function($q){
+							return $q->where(['is_status'=>'app']);
+						}])->order(['AppMenus.id'=>'ASC']);
 		
-         if($AppMenus){     
-    		$success = true;   $message = 'Menus Data Found Successfully';   
+         if(sizeof($AppMenusDatas) > 0){     
+			foreach($AppMenusDatas as $appmenu){ 
+			
+				$childrenDatas = $this->AppMenus->StockGroups
+							->find('children',['for'=>$appmenu['stock_group_id']])
+							->find('threaded')->where(['is_status'=>'app']);
+				
+				$appmenu->parent_stock_group->child_categories = $childrenDatas;
+				
+				$AppMenus[]=['header_name'=>'Menu','title'=>$appmenu];
+			}
+    		$success = true;   $message = 'Menus Data Found Successfully';  
+			
     	}else{    
     		$success = false;   $message = 'No data';  
     	}

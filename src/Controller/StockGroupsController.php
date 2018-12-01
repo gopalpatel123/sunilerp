@@ -103,10 +103,10 @@ class StockGroupsController extends AppController
 						new Folder($fullpath, true, 0777);
 					}
 				$this->request->data['stock_group_image']	=$statement_year;
-					
+				$stockGroup->stock_group_image = $this->request->data['stock_group_image'];	
 			}
-			$stockGroup->stock_group_image = $this->request->data['stock_group_image'];
-			//pr($stockGroup);exit;
+			
+		//	pr($stockGroup);exit;
             if ($this->StockGroups->save($stockGroup)) {
 				
 				if(!empty($stock_group_image['tmp_name'])){
@@ -158,7 +158,7 @@ class StockGroupsController extends AppController
             }
             $this->Flash->error(__('The App Category could not be saved. Please, try again.'));
         }
-        $parentStockGroups = $this->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app','id NOT IN'=>$id,'parent_id NOT IN'=>$id]);
+        $parentStockGroups = $this->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app','id NOT IN'=>$id,'parent_id IS NULL']);
         $companies = $this->StockGroups->Companies->find('list');
         $this->set(compact('stockGroup', 'parentStockGroups', 'companies'));
         $this->set('_serialize', ['stockGroup']);

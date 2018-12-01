@@ -46,9 +46,13 @@ $this->set('title', 'Edit App Menu');
 									<?php echo $this->Form->control('title_content',['class'=>'form-control input-sm gst','label'=>false]); ?>
 									
 								</div>
-								<div class="form-group">
+								<!--<div class="form-group">
 									<label>Under Group </label>
 									<?php echo $this->Form->control('parent_id',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-select-', 'options' => $parentAppMenus]); ?>
+								</div>-->
+								<div class="form-group">
+									<label>Category</label>
+									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-select-', 'options' => $parentStockGroups]); ?>
 								</div>
 								
 							

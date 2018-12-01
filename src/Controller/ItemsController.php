@@ -669,7 +669,7 @@ class ItemsController extends AppController
 		$company_id = $this->request->getData('company_id');
 		$location_id = $this->request->getData('location_id');
 
-		$item = $this->Items->find()->where(['item_code'=>$item_code]);
+		$item = $this->Items->find()->where(['item_code'=>$item_code])->contain(['Shades','Sizes']);
 
 		if (!empty($item->toArray())) 
 		{
