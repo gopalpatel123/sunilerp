@@ -70,17 +70,50 @@ class AppWishListsController extends AppController
       
     }
 
+	
+	public function wishlistremove($app_wish_list_item_id=null){
+		
+		$count=$this->AppWishLists->AppWishListItems->find()->where(['id'=>$app_wish_list_item_id])->count();
+		if($count>0){
+			$AppWishListItems=$this->AppWishLists->AppWishListItems->get($app_wish_list_item_id);
+			$this->AppWishLists->AppWishListItems->delete($AppWishListItems);
+		}
+
+	}
+	
+	
+	
       public function index()
 		{
-			
+			$AppWishLists=[];
 			$app_customer_id=@$this->request->query['app_customer_id'];
-			if(!empty($app_customer_id)){
-				$success = false;
-				$message = 'not successfully added';
-			}else{
-				$success = false;
-				$message = 'not successfully added';
+			$app_wish_list_item_id=@$this->request->query['app_wish_list_item_id'];
+			$tagname=@$this->request->query['tag'];
+			
+			if($tagname=='remove'){
+				
+				$this->wishlistremove($app_wish_list_item_id);
 			}
 			
+			
+			
+			if(!empty($app_customer_id)){
+				$AppWishLists=$this->AppWishLists->find()->where(['app_customer_id'=>$app_customer_id])
+				->contain(['AppWishListItems'=>['Items']]);
+				if($AppWishLists->toArray()){
+					$success = true;
+					$message = 'Data found';
+				}else{
+					$success = false;
+					$message = 'Data not found';
+				}
+				
+			}else{
+				$success = false;
+				$message = 'Empty Customer id';
+			}
+			
+			 $this->set(compact(['AppWishLists','success','message']));
+			 $this->set('_serialize', ['success','message','AppWishLists']);
 		}
 }

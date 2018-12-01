@@ -93,6 +93,11 @@ class ItemsTable extends Table
             'foreignKey' => 'app_brand_id',
             'joinType' => 'INNER'
 		]);
+		
+		$this->hasMany('AppWishListItems', [
+            'foreignKey' => 'item_id',
+            'joinType' => 'INNER'
+		]);
     }
 
     /**
