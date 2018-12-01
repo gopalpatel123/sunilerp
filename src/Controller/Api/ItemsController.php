@@ -32,18 +32,114 @@ class ItemsController extends AppController
 			$shade_id=@$this->request->query['shade_id'];
 			$size_id=@$this->request->query['size_id'];
 			$discount=@$this->request->query['discount'];
-			$price_range_start=@$this->request->query['price_range_start'];
-			$price_range_end=@$this->request->query['price_range_end'];
+			$price_range=@$this->request->query['price_range'];
+			$newest_order=@$this->request->query['newest_order'];
+			$price_order=@$this->request->query['price_order'];
+			$discount_order=@$this->request->query['discount_order'];
+			
+			/// Filter Given According Category
+				// Start Brand Category 
+				$Itemsforbrands=$this->Items->find()->where(['Items.sales_for'=>'online'])
+				->orwhere(['Items.sales_for'=>'online/offline'])
+				->where(['Items.stock_group_id'=>$category_id])
+				->contain(['AppBrands'])
+				 ->distinct(['app_brand_id']);
+				$Brand=[];
+				if($Itemsforbrands->toArray()){
+					
+					foreach($Itemsforbrands as $Itemsforbrand){
+						$Brand[]=$Itemsforbrand->app_brand;
+					}
+				}
+				$filters[]=['Brand'=>$Brand];
+				
+				//// End Code
+				
+				/// Size 
+				$size=[];
+				$Itemsforsizes=$this->Items->find()->where(['Items.sales_for'=>'online'])
+				->orwhere(['Items.sales_for'=>'online/offline'])
+				->where(['Items.stock_group_id'=>$category_id])
+				->contain(['Sizes'])
+				->innerJoinWith('Sizes')
+				 ->distinct(['size_id']);
+				if($Itemsforsizes->toArray()){
+					
+					foreach($Itemsforsizes as $Itemsforsize){
+						$size[]=$Itemsforsize->size;
+					}
+				}
+				$filters[]=['Size'=>$size];
+				
+				//End Size
+				
+				/// Start Shades 
+				$shade=[];
+				$Itemsforshades=$this->Items->find()->where(['Items.sales_for'=>'online'])
+				->orwhere(['Items.sales_for'=>'online/offline'])
+				->where(['Items.stock_group_id'=>$category_id])
+				->contain(['Shades'])
+				->innerJoinWith('Shades')
+				 ->distinct(['shade_id']);
+				
+				if($Itemsforshades->toArray()){
+					
+					foreach($Itemsforshades as $Itemsforshade){
+						$shade[]=$Itemsforshade->shade;
+					}
+				}
+				$filters[]=['Shade'=>$shade];
+				
+				//End Shades
+				
+				/// Start Discount 
+				
+				$discounts[]=['id'=>10,'name'=>'10 Above'];
+				$discounts[]=['id'=>20,'name'=>'20 Above'];
+				$discounts[]=['id'=>30,'name'=>'30 Above'];
+				
+				$filters[]=['Discount'=>$discounts];
+				
+				
+				//End Discount 
+				
+				/// Start Price Range 
+				
+				$Prices[]=['id'=>1000,'name'=>'1000 Above'];
+				$Prices[]=['id'=>3000,'name'=>'3000 Above'];
+				$Prices[]=['id'=>5000,'name'=>'5000 Above'];
+				$Prices[]=['id'=>10000,'name'=>'10000 Above'];
+				
+				$filters[]=['Price'=>$Prices];
+				
+				
+				//End Price Range 
+				
+			
+			////
 			
 			
+			/// Sort 
+			
+			$sorts[]=['id'=>'DESC','name'=>'Newest'];
+			$sorts[]=['id'=>'DESC','name'=>'Highest Price First'];
+			$sorts[]=['id'=>'ASC','name'=>'Lowest Price First'];
+			$sorts[]=['id'=>'DESC','name'=>'Discount'];
+			
+			$sort[]=['Sortdata'=>$sorts];
+			
+			//
+			$newest_orders=[];$price_orders=[];$discount_orders=[];
 			$shadeWhere=[];$sizeWhere=[];$discountWhere=[];$app_brandWhere=[];$price_range_starts=[];
 			$price_range_ends=[];
 			if(!empty($shade_id)){ $shadeWhere = ['shade_id' =>$shade_id]; }
 			if(!empty($size_id)){ $sizeWhere = ['size_id' =>$size_id]; }
 			if(!empty($discount)){ $discountWhere = ['discount >=' =>$discount];}
 			if(!empty($app_brand_id)){ $app_brandWhere = ['app_brand_id' =>$app_brand_id];}
-			if(!empty($price_range_start)){ $price_range_starts = ['sales_rate >= ' =>$price_range_start];}
-			if(!empty($price_range_end)){ $price_range_ends = ['sales_rate <= ' =>$price_range_end];}
+			if(!empty($price_range)){ $price_range_starts = ['sales_rate >= ' =>$price_range];}
+			if(!empty($newest_order)){ $newest_orders = ['Items.id' =>$newest_order];}
+			if(!empty($price_order)){ $price_orders = ['Items.sales_rate' =>$price_order];}
+			if(!empty($discount_order)){ $discount_orders = ['Items.discount' =>$discount_order];}
 			
 			if(!empty($category_id) and !empty($page_no)){
 				
@@ -57,7 +153,9 @@ class ItemsController extends AppController
 				->where($discountWhere)
 				->where($app_brandWhere)
 				->where($price_range_starts)
-				->where($price_range_ends)
+				->order($newest_orders)
+				->order($price_orders)
+				->order($discount_orders)
 				->page($page_no);
 				
 				if($Items->toArray()){
@@ -92,7 +190,7 @@ class ItemsController extends AppController
 			}
 		 
 		
-			$this->set(compact(['Items','success','message']));
-			$this->set('_serialize', ['success','message','Items']);
+			$this->set(compact(['Items','success','message','filters','sort']));
+			$this->set('_serialize', ['success','message','Items','filters','sort']);
 	}
 }
