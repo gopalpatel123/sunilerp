@@ -151,4 +151,6 @@ class AppCustomersTable extends Table
 
         return $rules;
     }
+	
+	
 }

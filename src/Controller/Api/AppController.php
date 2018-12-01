@@ -63,8 +63,21 @@ class AppController extends Controller
                 'Crud.ApiQueryLog'
             ]
         ]);
-		
-       
+	
+		$this->loadComponent('Auth', [
+			 'authenticate' => [
+					'Form' => [
+						'fields' => [
+							'username' => 'email',
+							'password' => 'password'
+						],
+						  'userModel' => 'AppCustomers'
+					]
+				],
+			   
+				'unauthorizedRedirect' => $this->referer(),
+			]);
+
 		
         /*
          * Enable the following component for recommended CakePHP security settings.
