@@ -131,7 +131,7 @@ class AppCartController extends AppController
         $appCart = $this->AppCart->newEntity();
         if ($this->request->is('post')) {
             $appCart = $this->AppCart->patchEntity($appCart, $this->request->getData());
-			pr($appCart);exit;	
+			//pr($appCart);exit;	
             if ($this->AppCart->save($appCart)) {
                 $success = true;
                 $message = "Item Added";
@@ -238,7 +238,7 @@ class AppCartController extends AppController
 		->group(['AppCart.user_id'])
 		->where(['AppCart.user_id'=>$user_id])->first();
 		//$total_mrp=$InvoiceCalculation->total_mrp;
-		$net_total=$InvoiceCalculation->total;
+		//echo $net_total=$InvoiceCalculation->total;exit;
 		
 		
 		$CashId = $this->AppCart->SalesInvoices->SalesInvoiceRows->Ledgers->find()
@@ -270,7 +270,7 @@ class AppCartController extends AppController
 		$total_discount=0;
 		$total_amount=0;
 		$tot_gst=0;
-		foreach($app_carts as $app_cart){ //pr($app_cart); exit;
+		foreach($app_carts as $app_cart){ 
 			if($app_cart->kind_of_gst == "fix"){
 				$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->first_gst_figure_id);
 				if($app_cart->discount==0){
@@ -299,7 +299,7 @@ class AppCartController extends AppController
 					$total_amount+=$amount;
 					//pr($amount-$gst_rate); pr($gst_rate); pr($amount);
 				}
-			}else{
+			}else{ 
 					//$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->first_gst_figure_id);
 					if($app_cart->discount==0){
 						
@@ -319,18 +319,20 @@ class AppCartController extends AppController
 						$total_amount+=$amount;
 						
 						//$gst_rate=($app_cart->price*$tax_percentage)/$x;
-					}else{ //pr($app_cart->price); 
+					}else{ 
 						$dis=($app_cart->price*$app_cart->discount)/100;
 						$total_discount+=$dis;
 						$newPrice=$app_cart->price-$dis;
-						if($newPrice < 1050){
+						
+						if($newPrice < 1050){ 
 							$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->first_gst_figure_id);
-						}else if($newPrice >= 1050){
+						}else if($newPrice >= 1050){ 
 							$GstFig=$this->AppCart->Items->GstFigures->get($app_cart->second_gst_figure_id);
 						}
+						//pr($GstFig); exit;
 						$tax_percentage=($GstFig->tax_percentage);
 						$x=100+$GstFig->tax_percentage;
-						$amount=$newPrice*$app_cart->quantity;
+						$amount=round($newPrice*$app_cart->quantity,2);
 						$gst_rate=($amount*$tax_percentage)/$x;
 						$total_taxable_amount+=$amount-$gst_rate;
 						$total_gst_amount+=$gst_rate;
@@ -398,10 +400,15 @@ class AppCartController extends AppController
 			}
 		}
 			
+		$taxable_with_gst=round($total_taxable_amount,2)+ round($tot_gst,2);
+		$x=round($total_amount,2);
+		$y=round($total_amount);
+		$round_off_amt=round(($y-$taxable_with_gst),2);
+		
 		// Sales CAsh Entry
 		$AccountingEntrie = $this->AppCart->SalesInvoices->AccountingEntries->newEntity();
 		$AccountingEntrie->ledger_id = @$CashId->id;
-		$AccountingEntrie->debit = round($total_amount,2);
+		$AccountingEntrie->debit = round($y,2);
 		$AccountingEntrie->credit = 0;
 		$AccountingEntrie->transaction_date = $today;
 		$AccountingEntrie->company_id = $company_id;
@@ -419,9 +426,10 @@ class AppCartController extends AppController
 		$this->AppCart->SalesInvoices->AccountingEntries->save($AccountingEntrie);
 		
 		
-		$taxable_with_gst=round($total_taxable_amount,2)+ round($tot_gst,2);
-		$round_off_amt=round(round($total_amount,2)-$taxable_with_gst,2);
 		
+		//pr($taxable_with_gst);
+		//pr($y);
+		//pr($round_off_amt); exit;
 		$roundOffId = $this->AppCart->SalesInvoices->SalesInvoiceRows->Ledgers->find()
 		->where(['Ledgers.company_id'=>$company_id, 'Ledgers.round_off'=>1])->first();
 		
@@ -431,9 +439,9 @@ class AppCartController extends AppController
 		if($round_off_amt > 0){
 			$AccountingEntrie->debit = 0;
 			$AccountingEntrie->credit = round($round_off_amt,2);
-		}else if($round_off_amt > 0){
+		}else if($round_off_amt < 0){
 			$AccountingEntrie->credit = 0;
-			$AccountingEntrie->debit = round($round_off_amt,2);
+			$AccountingEntrie->debit = abs(round($round_off_amt,2));
 
 		}
 		$AccountingEntrie->transaction_date = $today;
@@ -445,6 +453,8 @@ class AppCartController extends AppController
 		$total_cgst= round($tot_gst,2)/2;
 		$total_sgst= round($tot_gst,2)/2;
 		$round_off_amt= round($round_off_amt,2);
+		
+	  $net_total=$y;
 		
 		$query_update = $this->AppCart->SalesInvoices->query();
 		$query_update->update()
