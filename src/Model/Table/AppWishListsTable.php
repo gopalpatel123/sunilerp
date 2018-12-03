@@ -48,6 +48,7 @@ class AppWishListsTable extends Table
         $this->hasMany('AppWishListItems', [
             'foreignKey' => 'app_wish_list_id'
         ]);
+		 $this->belongsTo('Carts');
     }
 
     /**

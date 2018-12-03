@@ -81,6 +81,25 @@ class AppWishListsController extends AppController
 
 	}
 	
+	public function movetoCart($app_customer_id=null,$app_wish_list_item_id=null,$item_id=null){
+		
+		$Cartsdatas=$this->AppWishLists->Carts->find()->where(['Carts.app_customer_id'=>$app_customer_id,'Carts.item_id'=>$item_id])->toArray();
+		
+				if(empty($Cartsdatas)){
+					 $Items=$this->AppWishLists->Carts->Items->get($item_id);
+					 $sales_rate=$Items->sales_rate;
+					 $cart = $this->AppWishLists->Carts->newEntity();
+					 $cart->app_customer_id=$app_customer_id;
+					 $cart->item_id=$item_id;
+					 $cart->quantity=1;
+					 $cart->rate=$sales_rate;
+					 $cart->amount=$sales_rate;
+					 $cart->cart_count=1;
+					 $this->AppWishLists->Carts->save($cart);
+					 
+				}
+				$this->wishlistremove($app_wish_list_item_id);
+	}
 	
 	
       public function index()
@@ -88,6 +107,7 @@ class AppWishListsController extends AppController
 			$AppWishLists=[];
 			$app_customer_id=@$this->request->query['app_customer_id'];
 			$app_wish_list_item_id=@$this->request->query['app_wish_list_item_id'];
+			$item_id=@$this->request->query['item_id'];
 			$tagname=@$this->request->query['tag'];
 			
 			if($tagname=='remove'){
@@ -95,7 +115,10 @@ class AppWishListsController extends AppController
 				$this->wishlistremove($app_wish_list_item_id);
 			}
 			
-			
+			if($tagname=='movecart'){
+				$this->movetoCart($app_customer_id,$app_wish_list_item_id,$item_id);
+				
+			}
 			
 			if(!empty($app_customer_id)){
 				$AppWishLists=$this->AppWishLists->find()->where(['app_customer_id'=>$app_customer_id])
