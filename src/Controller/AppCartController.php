@@ -199,12 +199,15 @@ class AppCartController extends AppController
 		$name="Gops";
 		$address="Savina"; */
 		//exit;
-		$customerCheck=$this->AppCart->SalesInvoices->Customers->find()->where(['Customers.company_id'=>$company_id,'Customers.mobile'=>$mobile])->first();
 		
+		if(!empty($mobile)){
+			$customerCheck=$this->AppCart->SalesInvoices->Customers->find()->where(['Customers.company_id'=>$company_id,'Customers.mobile'=>$mobile])->first();
+		}else{
+			$customerCheck=array();
+			$customerCheck=(object)$customerCheck;
+		}
 		
 		if($customerCheck){
-			$customerData=$customerCheck;
-		}else{
 			$Customer = $this->AppCart->SalesInvoices->Customers->newEntity();
 			$Customer->name = $name;
 			$Customer->state_id = 46;
@@ -214,9 +217,12 @@ class AppCartController extends AppController
 			//$Customer->gstin = $gst_no;
 			$Customer->address = $address;
 			$customerData=$this->AppCart->SalesInvoices->Customers->save($Customer);
+			
+		}else{
+			$customerData=$customerCheck;
 		} 
-		
-	
+		//pr($customerData);exit;
+	//pr($customerData);exit;
 		//pr(['company_id'=>$company_id]); exit;
 		$today=date('Y-m-d');
 		$FinancialYear = $this->AppCart->SalesInvoices->Companies->FinancialYears->find()->where(['company_id'=>$company_id,'fy_from <='=>$today,'fy_to >='=>$today])->first();
@@ -250,6 +256,7 @@ class AppCartController extends AppController
 		$SalesId=$Salesdata->id;
 		//$SalesId=33;
 		//Sales Invoice Entry
+		
 		$SalesInvoice = $this->AppCart->SalesInvoices->newEntity();
 		$SalesInvoice->voucher_no = $voucher_no;
 		$SalesInvoice->company_id = $company_id;
@@ -257,7 +264,14 @@ class AppCartController extends AppController
 		$SalesInvoice->financial_year_id = $financial_year_id;
 		$SalesInvoice->amount_after_tax = $InvoiceCalculation->total;
 		$SalesInvoice->transaction_date = $today;
-		$SalesInvoice->customer_id = $customerData->id;
+		if($customerData){
+			$SalesInvoice->customer_id = 0;
+			
+		}else{
+			$SalesInvoice->customer_id = $customerData->id;
+		}
+		
+		
 		$SalesInvoice->invoice_receipt_type = "CASH"; 
 		$SalesInvoiceData=$this->AppCart->SalesInvoices->save($SalesInvoice);
 		
