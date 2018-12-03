@@ -9,6 +9,11 @@ use Cake\Validation\Validation;
 
 class AppMenusController extends AppController
 {
+	public function initialize()
+    {
+        parent::initialize();
+        $this->Auth->allow(['getAppMenus']);
+    }
 	 public function getAppMenus()
     {
 

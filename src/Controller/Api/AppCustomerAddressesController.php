@@ -20,7 +20,7 @@ class AppCustomerAddressesController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['fetchAddresses','addCustomerAddresses','getStates','getCities','editAddresses','deleteCustomerAddress']);
+        $this->Auth->allow(['fetchAddresses','addUpdateCustomerAddresses','getStates','getCities','deleteCustomerAddress']);
     }
 	
 	public function fetchAddresses(){
@@ -42,10 +42,13 @@ class AppCustomerAddressesController extends AppController
 	
 	}
 	
-    public function addCustomerAddresses()
+    public function addUpdateCustomerAddresses()
     {
-        $appCustomerAddress = $this->AppCustomerAddresses->newEntity();
-        if ($this->request->is('post')) {
+		$is_address=$this->request->getData('is_address');
+		$id=$this->request->getData('id');
+		if($is_address == 'new'){
+			 $appCustomerAddress = $this->AppCustomerAddresses->newEntity();
+			  if ($this->request->is('post')) {
 			$app_customer_id=$this->request->getData('app_customer_id');
             $appCustomerAddress = $this->AppCustomerAddresses->patchEntity($appCustomerAddress, $this->request->getData());
 			
@@ -55,30 +58,76 @@ class AppCustomerAddressesController extends AppController
 			    $error_msg=[];
 			}else{
 				
-				if($appCustomerAddress->errors()){
-                $error_msg = [];
-				$i=0;
-                foreach( $appCustomerAddress->errors() as $key=>$errors){ 
-                    if(is_array($errors)){
-                        foreach($errors as $error){
-                            $error_msg[$i][$key]    =   $error;
-                        }
-                    }else{
-                        $error_msg[$i][$key]    =   $errors;
-                    }$i++;
-                }
+					if($appCustomerAddress->errors()){
+					$error_msg = [];
+					$i=0;
+					foreach( $appCustomerAddress->errors() as $key=>$errors){ 
+						if(is_array($errors)){
+							foreach($errors as $error){
+								$error_msg[$i][$key]    =   $error;
+							}
+						}else{
+							$error_msg[$i][$key]    =   $errors;
+						}$i++;
+					}
 
-                if(!empty($error_msg)){
-					$success = false;
-					$message = "Please fix the following error(s):";
-                    
-                }
-            }
+					if(!empty($error_msg)){
+						$success = false;
+						$message = "Please fix the following error(s):";
+						
+					}
+				}
 				
 			}
-            $this->set(compact(['error_msg','success','message']));
-			$this->set('_serialize', ['success','message','error_msg']);
+           
         }
+		}else{
+			$appCustomerAddress = $this->AppCustomerAddresses->get($id);
+			$AppCustomerAddressesExists = $this->AppCustomerAddresses->exists(['id' => $id]);
+			if($AppCustomerAddressesExists){
+			  $appCustomerAddress = $this->AppCustomerAddresses->get($id);
+				if ($this->request->is('post')) {
+					$id=$this->request->getData('id');
+					$appCustomerAddress = $this->AppCustomerAddresses->patchEntity($appCustomerAddress, $this->request->getData());
+					
+					if($this->AppCustomerAddresses->save($appCustomerAddress)) {
+						$success = true;
+						$message = 'Customer addresses updated';
+						$error_msg=[];
+					}else{
+						
+						if($appCustomerAddress->errors()){
+						$error_msg = [];
+						$i=0;
+						foreach( $appCustomerAddress->errors() as $key=>$errors){ 
+							if(is_array($errors)){
+								foreach($errors as $error){
+									$error_msg[$i][$key]    =   $error;
+								}
+							}else{
+								$error_msg[$i][$key]    =   $errors;
+							}$i++;
+						}
+
+						if(!empty($error_msg)){
+							$success = false;
+							$message = "Please fix the following error(s):";
+							
+						}
+					}
+						
+					}
+					
+				}
+			}else{
+					$success = false;
+					$message = "No Data Found";
+					$error_msg=[];
+			}
+		}
+		$this->set(compact(['error_msg','success','message']));
+		$this->set('_serialize', ['success','message','error_msg']);
+       
         
     }
 	
