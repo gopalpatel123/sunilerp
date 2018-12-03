@@ -178,9 +178,54 @@ class AppCustomersController extends AppController
 			$AppCustomersExists = $this->AppCustomers->exists(['id' => $id]);
 			if($AppCustomersExists){
 				$appCustomer = $this->AppCustomers->get($id);
+				$image_url_exist = $appCustomer->image_url;
 				if ($this->request->is('post')) {
+					$image_url=@$this->request->getData('image_url');
+					if(!empty($image_url['tmp_name']))
+					{
+						$this->request->data['image_url']=$image_url;			 
+					}
+					else
+					{
+						if(!empty($image_url_exist))
+						{
+							$appCustomer->image_url=$image_url_exist;	
+						}
+						else
+						{
+							$appCustomer->image_url='';
+						}
+					}
 					$appCustomer = $this->AppCustomers->patchEntity($appCustomer, $this->request->getData());
+					$appCustomer->mobile = $appCustomer->mobile;
+					$appCustomer->email = $appCustomer->email;
 					if ($this->AppCustomers->save($appCustomer)) {
+						
+						if(!empty($image_url['tmp_name'])){
+							$item_error=$image_url['error'];
+							if(empty($item_error))
+								{
+									$item_ext=explode('/',$image_url['type']);
+									$item_item_image='customer'.time().'.'.$item_ext[1];
+								}
+							if(empty($files['error']))
+							{
+								$keyname = 'Appcustomer/'.$appCustomer->id.'/'.$item_item_image;
+								$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
+								if($image_url_exist){
+									$this->AwsFile->deleteObjectFile($image_url_exist);
+								}
+								
+							}
+							$query = $this->AppCustomers->query();
+							$query->update()
+							->set([
+							'image_url' => $keyname
+							])
+							->where(['id' => $appCustomer->id])
+							->execute();
+						}
+						
 						$success = true;
 						$message = 'profile updated';
 						$error_msg=[];
