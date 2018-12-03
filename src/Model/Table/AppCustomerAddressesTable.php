@@ -66,7 +66,11 @@ class AppCustomerAddressesTable extends Table
     {
         $validator
             ->integer('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmpty('id', 'create'); 
+		
+		$validator
+            ->integer('app_customer_id')
+            ->allowEmpty('app_customer_id', 'create');
 
         $validator
             ->requirePresence('name', 'create')
@@ -96,23 +100,23 @@ class AppCustomerAddressesTable extends Table
             ->requirePresence('pincode', 'create')
             ->notEmpty('pincode');
 
-        $validator
+       /*  $validator
             ->requirePresence('latitude', 'create')
             ->notEmpty('latitude');
 
         $validator
             ->requirePresence('longitude', 'create')
-            ->notEmpty('longitude');
+            ->notEmpty('longitude'); */
 
         $validator
             ->integer('default_address')
             ->requirePresence('default_address', 'create')
             ->notEmpty('default_address');
 
-        $validator
+        /* $validator
             ->integer('is_deleted')
             ->requirePresence('is_deleted', 'create')
-            ->notEmpty('is_deleted');
+            ->notEmpty('is_deleted'); */
 
         return $validator;
     }

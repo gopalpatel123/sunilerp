@@ -21,7 +21,7 @@ class AppCustomersController extends AppController
 	 public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['login','send_otp','sociallogin','signup']);
+        $this->Auth->allow(['login','send_otp','sociallogin','signup','editProfile']);
     }
 	
 	public function send_otp(){
@@ -170,6 +170,52 @@ class AppCustomersController extends AppController
 			$this->set(compact(['AppCustomers','success','message']));
 			$this->set('_serialize', ['success','message','AppCustomers']);
 		
+		}
+		
+		
+		public function editProfile(){
+			$id= $this->request->data('id');
+			$AppCustomersExists = $this->AppCustomers->exists(['id' => $id]);
+			if($AppCustomersExists){
+				$appCustomer = $this->AppCustomers->get($id);
+				if ($this->request->is('post')) {
+					$appCustomer = $this->AppCustomers->patchEntity($appCustomer, $this->request->getData());
+					if ($this->AppCustomers->save($appCustomer)) {
+						$success = true;
+						$message = 'profile updated';
+						$error_msg=[];
+					}else{
+						if($appCustomer->errors()){
+							$error_msg = [];
+							$i=0;
+							foreach( $appCustomer->errors() as $key=>$errors){ 
+								if(is_array($errors)){
+									foreach($errors as $error){
+										$error_msg[$i][$key]    =   $error;
+									}
+								}else{
+									$error_msg[$i][$key]    =   $errors;
+								}$i++;
+							}
+
+							if(!empty($error_msg)){
+								$success = false;
+								$message = "Please fix the following error(s):";
+								
+							}
+						}
+					
+					}
+				}
+			}else{
+				$success = false;
+				$message = "No Data Found";
+				$error_msg=[];
+			}
+			
+		$this->set(compact(['error_msg','success','message']));
+		$this->set('_serialize', ['success','message','error_msg']);	
+			
 		}
 		
 }
