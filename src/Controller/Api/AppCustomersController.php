@@ -60,7 +60,7 @@ class AppCustomersController extends AppController
 	public function sociallogin(){
 		
 		$email=@$this->request->query['email'];
-		$AppCustomers=[];
+		$AppCustomers=(object)[];
 		if(!empty($email)){
 			
 			$exists_email = $this->AppCustomers->exists(['AppCustomers.email'=>$email]);
@@ -98,7 +98,7 @@ class AppCustomersController extends AppController
                 $this->request->data['email'] = $this->request->data['username'];
                 unset($this->request->data['username']);
 
-			$AppCustomers=[];
+			$AppCustomers=(object)[];
 			$user = $this->Auth->identify();
 			
 			if(!empty($username) and !empty($password)){
@@ -157,13 +157,13 @@ class AppCustomersController extends AppController
 					}else{
 						$success = false;
 						$message = "The customer could not be saved. Please, try again"; 
-						$AppCustomers=[];
+						$AppCustomers=(object)[];
 						
 					}
 				 }else{
 					$success = false;
 					$message="Email is already taken"; 
-					$AppCustomers=[]; 
+					$AppCustomers=(object)[]; 
 					
 				 }
 			}

@@ -21,8 +21,70 @@ class CartsController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['addtoCart','removeCart']);
+        $this->Auth->allow(['addtoCart','removeCart','cartList']);
     }
+	
+	public function cartlistAdd($cart_id=null,$quantity=null){
+		
+		$cartcount=$this->Carts->find()->where(['Carts.id'=>$cart_id])->count();
+		if($cartcount>0){
+			$Cartsupdate=$this->Carts->get($cart_id);
+			$Items=$this->Carts->Items->get($Cartsupdate->item_id);
+			$sales_rate=$Items->sales_rate;
+			$amount=$quantity*$sales_rate;
+			$Cartsupdate->rate=$sales_rate;
+			$Cartsupdate->amount=$amount;
+			$Cartsupdate->quantity=$quantity;
+			$Cartsupdate->cart_count=$quantity;
+			$this->Carts->save($Cartsupdate);
+		}
+		
+	}
+	
+	public function cartlistRemove($cart_id=null){
+		$cartcount=$this->Carts->find()->where(['Carts.id'=>$cart_id])->count();
+		if($cartcount>0){
+			$Cartsupdate=$this->Carts->get($cart_id);
+			$this->Carts->delete($Cartsupdate);
+		}
+	}
+	
+	public function cartList(){
+		$Carts=(object)[];
+		$app_customer_id=@$this->request->query['app_customer_id'];
+		$Cart_id=@$this->request->query['cart_id'];
+		$quantity=@$this->request->query['quantity'];
+		$tag_name=@$this->request->query['tag'];
+		if(!empty($app_customer_id)){
+			
+			$Addresscount=$this->Carts->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0])->count();
+			if($Addresscount>0){ $Isaddress=true; }else{ $Isaddress=false;}
+			
+			if($tag_name=='add'){ $this->cartlistAdd($Cart_id,$quantity); }
+			if($tag_name=='remove'){ $this->cartlistRemove($Cart_id); }
+			
+			$Cartdatas=$this->Carts->find()->where(['app_customer_id'=>$app_customer_id])->toArray();
+			if($Cartdatas){
+				$Carts=$Cartdatas;
+				$success = true;
+				$message="Data found Successfully";
+			}else{
+				$success = false;
+				$message="Data not found";
+			}
+			
+			
+		}else{
+			
+			$success = false;
+		    $message="Empty customer id";
+			
+		}
+		
+		$this->set(compact(['success','message','Isaddress','Carts']));
+		$this->set('_serialize', ['success','message','Isaddress','Carts']);
+		
+	}
 	
 	public function addtoCart(){
 			$app_customer_id=@$this->request->query['app_customer_id'];
