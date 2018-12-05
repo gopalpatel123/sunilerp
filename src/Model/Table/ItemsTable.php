@@ -98,6 +98,11 @@ class ItemsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
 		]);
+		
+		$this->hasMany('ItemImageRows', [
+            'foreignKey' => 'item_id',
+            'joinType' => 'INNER'
+		]);
     }
 
     /**

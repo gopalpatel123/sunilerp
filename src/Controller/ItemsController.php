@@ -216,8 +216,32 @@ class ItemsController extends AppController
 				$data_to_encode = strtoupper($item->provided_item_code);
 			}
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
-            if ($this->Items->save($item))
+            
+			if ($this->Items->save($item))
 			{
+				if(!empty($item->item_image_rows)){
+					foreach($item->item_image_rows as $item_image_row){ 
+						if(!empty($item_image_row['image_url']['tmp_name'])){
+							$item_errors=$item_image_row['image_url']['error'];
+							if(empty($item_errors))
+							{
+								$item_extt=explode('/',$item_image_row['image_url']['type']);
+								$item_item_images='itemrows'.time().'.'.$item_extt[1];
+							}
+							
+							$keyname1 = 'ItemRows/'.$item->id.'/'.$item_item_images;
+							$this->AwsFile->putObjectFile($keyname1,$item_image_row['image_url']['tmp_name'],$item_image_row['image_url']['type']);
+						}
+						$query = $this->Items->ItemImageRows->query();
+						$query->insert(['item_id', 'image_url','status'])
+						->values([
+									'item_id' => $item->id,
+									'image_url' => $keyname1,
+									'status' => 'Active'
+									]);
+						$query->execute(); 	
+					}
+				}
 				
 				if(!empty($image_url['tmp_name'])){
 						$item_error=$image_url['error'];
@@ -279,6 +303,7 @@ class ItemsController extends AppController
             }
             $this->Flash->error(__('The item could not be saved. Please, try again.'));
         }
+        
         $units = $this->Items->Units->find('list')->where(['company_id'=>$company_id]);
         $stockGroups = $this->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']);
 		

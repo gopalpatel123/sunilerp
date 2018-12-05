@@ -16,7 +16,6 @@ $this->set('title', 'Create Item');
 			<div class="portlet-body">
 				<?= $this->Form->create($item,['onsubmit'=>'return checkValidation()','allow_to_submit'=>'0','id'=>'CreateItem','type'=>'file']) ?>
 				<div class="row">
-				
 					<div class="col-md-6">
 					    <div class="form-group">
 							<label>Item Name <span class="required">*</span></label>
@@ -223,12 +222,52 @@ $this->set('title', 'Create Item');
 						</div>
 					</div>
 				</div>
+				<div class="col-md-12 ">
+					<div class="row" >
+						<div class="form-group"><label><b>Add Multiple Image</b></label>
+							<table id="file_table" style="line-height:2.5">
+								<tr class="tr1">
+									<td>
+										<?php echo $this->Form->control('q',['class'=>'form-control input-sm select_file','label'=>false, 'type' =>'file']); ?>
+									</td>
+									<td>
+										<?php 
+										$option['Active']='Active';
+										$option['Deactive']='Deactive';
+										echo $this->Form->control('q',['class'=>'form-control input-sm select2me status','label'=>false,'empty'=>'-select-', 'options' => $option,'value'=>'Active']); ?>
+									</td>
+									<td>
+										<?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-plus']) . __(''), ['class'=>'btn btn-block btn-primary btn-sm add_more','type'=>'button']) ?>
+									</td>
+									<td></td>
+								</tr>
+							</table>
+						</div>	
+					</div>
+				</div>
 				<?= $this->Form->button(__('Submit'),['class'=>'btn btn-success']) ?>
 				<?= $this->Form->end() ?>
 			</div>
 		</div>
 	</div>
 </div>
+<table id="copy_row" style="display:none;">	
+	<tbody>
+		<tr>
+			<td><?php echo $this->Form->control('q',['class'=>'form-control input-sm select_file','label'=>false, 'type' =>'file']); ?></td>
+			<td>
+				<?php 
+				$option['Active']='Active';
+				$option['Deactive']='Deactive';
+				echo $this->Form->control('q',['class'=>'form-control input-sm select2me status','label'=>false,'empty'=>'-select-', 'options' => $option,'value'=>'Active']); ?>
+			</td>
+			<td><?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-plus']) . __(''), ['class'=>'btn btn-block btn-primary btn-sm add_more','type'=>'button']) ?>
+			</td>
+			<td style="padding: 5px;">
+			<?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-trash']) . __(''), ['class'=>'btn btn-block btn-danger btn-sm delete_row','type'=>'button']) ?></td>
+		</tr>
+	</tbody>
+</table>
 <!-- BEGIN PAGE LEVEL STYLES -->
 	<!-- BEGIN COMPONENTS PICKERS -->
 	<?php echo $this->Html->css('/assets/global/plugins/clockface/css/clockface.css', ['block' => 'PAGE_LEVEL_CSS']); ?>
@@ -286,6 +325,30 @@ $this->set('title', 'Create Item');
 	  $('.reverseCalculation').die().live('keyup',function(){
 		   reverce_amt_calc();
 	  });
+	  $(document).on('click','button.add_more',function() {
+				var row=$('#copy_row tbody').html();
+				$('#file_table tbody').append(row);
+rename_rows();
+			});
+			
+		$(document).on('click','button.delete_row',function() {
+			$(this).closest('tr').remove();
+		});
+		
+		rename_rows();
+		function rename_rows(){ 
+			var list = new Array();
+			var p=0;
+			var i=0;
+			$('#file_table tbody tr').each(function(){ 
+				i++;
+$(this).find('td:nth-child(1) input.select_file').attr('name','item_image_rows['+i+'][image_url]')
+.attr('id','item_image_rows-'+i+'-image_url');
+$(this).find('td:nth-child(2) select.status').attr('name','item_image_rows['+i+'][status]')
+.attr('id','item_image_rows-'+i+'-status');		
+			});
+		}
+		
 	  function amt_calc()
 	  {
 		  var qty = $('.qty').val();
