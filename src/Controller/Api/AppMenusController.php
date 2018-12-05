@@ -21,7 +21,7 @@ class AppMenusController extends AppController
 						->contain(['ParentStockGroups'=>function($q){
 							return $q->where(['is_status'=>'app']);
 						}])->order(['AppMenus.id'=>'ASC']);
-		
+		$menu=[];$others=[];
          if(sizeof($AppMenusDatas) > 0){     
 			foreach($AppMenusDatas as $appmenu){ 
 			
@@ -29,12 +29,21 @@ class AppMenusController extends AppController
 							->find('children',['for'=>$appmenu['stock_group_id']])
 							->find('threaded')->where(['is_status'=>'app']);
 				
-				$appmenu->parent_stock_group->child_categories = $childrenDatas;
 				
-				$AppMenus[]=['header_name'=>'Menu','title'=>$appmenu];
+				if($appmenu->title_content == "Menu"){
+					$menu[] = $appmenu;
+					unset($appmenu->parent_stock_group);
+					$appmenu->child_categories = $childrenDatas;
+				}else if($appmenu->title_content == "Others"){
+					$others[] = $appmenu;
+					unset($appmenu->parent_stock_group);
+				}
 			}
-    		$success = true;   $message = 'Menus Data Found Successfully';  
-			
+    		
+			$AppMenus=['header_name'=>'Menu','title'=>$menu];
+			$AppMenus=['header_name'=>'Menu','title'=>$others];
+			$AppMenus[] = array_push($AppMenus,$AppMenus);
+			$success = true;   $message = 'Menus Data Found Successfully';  
     	}else{    
     		$success = false;   $message = 'No data';  
     	}

@@ -20,7 +20,7 @@ class AppCustomerAddressesController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['fetchAddresses','addUpdateCustomerAddresses','getStates','getCities','deleteCustomerAddress']);
+        $this->Auth->allow(['fetchAddresses','addUpdateCustomerAddresses','getStates','getCities','deleteCustomerAddress','getStatesCity']);
     }
 	
 	public function fetchAddresses(){
@@ -199,16 +199,18 @@ class AppCustomerAddressesController extends AppController
 		$this->set('_serialize', ['success','message','error_msg']);
 	}
 	
-	public function getStates(){ 
+	public function getStatesCity(){ 
 		$this->loadModel('States');
+		$this->loadModel('Cities');
+		$Cities = $this->Cities->find();
 		$States = $this->States->find();
 		if($States){     
-    		$success = true;   $message = 'States Data Found Successfully';   
+    		$success = true;   $message = 'States and City Data Found Successfully';   
     	}else{    
     		$success = false;   $message = 'No data';  
     	}
     	
-    	$this->set(['success' => $success,'message'=>$message,'States'=>$States,'_serialize' => ['success','message','States']]); 
+    	$this->set(['success' => $success,'message'=>$message,'States'=>$States,'Cities'=>$Cities,'_serialize' => ['success','message','States','Cities']]); 
 	}
 	
 	public function getCities(){ 

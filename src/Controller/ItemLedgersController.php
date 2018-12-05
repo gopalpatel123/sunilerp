@@ -165,47 +165,7 @@ class ItemLedgersController extends AppController
 		$session_location_id =$this->Auth->User('session_location_id');
 		$stock_group_id = $this->request->query('stock_group_id');
 		$stock_sub_group_id = $this->request->query('stock_subgroup_id');
-		$first_time="Yes";
-		
-		$where=[];
-		if(empty($total)){ 
-			$total='All';
-			
-		}
-		if(!empty($stock_sub_group_id)){
-			$first_time="No";
-			$where['Items.stock_group_id']=$stock_sub_group_id;
-		}
-		$to_date   = $this->request->query('to_date');
-		if(!empty($to_date)){  
-			$first_time="No";
-			$to_date   = date("Y-m-d",strtotime($to_date));
-		}
-		else{
-			$to_date   = date("Y-m-d");
-		}
-		
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
-		
-		//pr($remaining); exit;
-		$companies=$this->ItemLedgers->Companies->find()->contain(['States'])->where(['Companies.id'=>$company_id])->first();
-	
-		$stockGroups = $this->ItemLedgers->Items->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id,'StockGroups.parent_id IS NULL']);
-		$stockSubgroups=$this->ItemLedgers->Items->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id]);
-        $this->set(compact('companies','status','url','stockGroups','unit_rate','remaining','Items','stockGroups','to_date','stockSubgroups','stock_sub_group_id','stock_group_id','total','first_time'));
-        $this->set('_serialize', ['itemLedgers']);
-    }
-	
-	public function getStocks(){
-		 $this->viewBuilder()->layout('');
-		$status=$this->request->query('status'); 
-		$total=$this->request->query('total'); 
-		 
-		$company_id=$this->Auth->User('session_company_id');
-		$session_location_id =$this->Auth->User('session_location_id');
-		$stock_group_id = $this->request->query('stock_group_id');
-		$stock_sub_group_id = $this->request->query('stock_subgroup_id');
+		$item_id = $this->request->query('item_id');
 		
 		$first_time="Yes";
 		
@@ -228,6 +188,10 @@ class ItemLedgersController extends AppController
 			$first_time="No";
 			$where['Items.stock_group_id']=$stock_sub_group_id;
 		}
+		if(!empty($item_id)){
+			$first_time="No";
+			$where['Items.id']=$item_id;
+		}
 		$to_date   = $this->request->query('to_date');
 		if(!empty($to_date)){  
 			$first_time="No";
@@ -241,64 +205,135 @@ class ItemLedgersController extends AppController
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
 		//$x=['6176','6177','6173','6172','6174','6178','6179','6180','6025'];
-		//if($first_time=="No"){ 
-			$Items=$this->ItemLedgers->Items->find()->contain(['Shades','Sizes','StockGroups'=>['ParentStockGroups']])->where($where)->where(['Items.company_id'=>$company_id ,'Items.created_on <='=>$to_date]); 
-			//pr($Items->toArray());exit;
-			$remaining=[];$unit_rate=[];$stock=[];
-			foreach($Items as $Item){
-				$dataexist=$this->ItemLedgers->exists(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.location_id'=>$session_location_id ]);
+		$this->paginate = [
+            'limit' => 50
+        ];
+		
+		
+		if($first_time=="No"){ 
+			 $Items=$this->paginate($this->ItemLedgers->Items->find()->contain(['Shades','Sizes','StockGroups'=>['ParentStockGroups']])->where($where)->where(['Items.company_id'=>$company_id ,'Items.created_on <='=>$to_date])); 
+		    $remaining=[];$unit_rate=[];
+		    foreach($Items as $item){
+		        $dataexist=$this->ItemLedgers->exists(['ItemLedgers.item_id'=>$item->id,'ItemLedgers.location_id'=>$session_location_id ]);
 				if($dataexist==1){ 
-					
-					/* $ItemLedgersIn=$this->ItemLedgers->find()
-					->select(['item_id','rate','quantity'=>$this->ItemLedgers->find()->func()->sum('ItemLedgers.quantity')])
-					->group(['ItemLedgers.item_id'])
-					->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'in'])->first();
-					
-					$ItemLedgersQty=$this->ItemLedgers->find()
-					->select(['item_id','quantity'=>$this->ItemLedgers->find()->func()->sum('ItemLedgers.quantity')])
-					->group(['ItemLedgers.item_id'])
-					->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'out'])->first();
-					//pr($session_location_id);
-					//pr($ItemLedgersIn);
-					//pr($ItemLedgersQty); exit;
-					$closingValue=0;
-					$rate=0;
-					$due=@$ItemLedgersIn->quantity-@$ItemLedgersQty->quantity; */
-					
-					$purchaseRate=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'in','ItemLedgers.grn_id >'=>0])->first();
-					//pr($purchaseRate->rate); exit;
-					
-					$queryIn=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'in']);
-					$queryIn->select(['item_id','totalIn' => $queryIn->func()->sum('ItemLedgers.quantity')])->group('ItemLedgers.item_id');
-					
-					$queryOut=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'out']);
-					$queryOut->select(['item_id','totalOut' => $queryOut->func()->sum('ItemLedgers.quantity')])->group('ItemLedgers.item_id');
-					
-					$due=(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut);
-					
-					if($total=='Zero' && @$due == 0){ 
-						$remaining[$Item->id]=round(@$ItemLedgersIn->quantity-@$ItemLedgersQty->quantity,2);
-						$unit_rate[$Item->id]=	0;
-					}else if($total=='Positive' && @$due > 0){
-						$remaining[$Item->id]=round(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut,2);
-						$unit_rate[$Item->id]=	@$purchaseRate->rate;
-					}else if($total=='All'){ 
-						$remaining[$Item->id]=round(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut,2);
-						$unit_rate[$Item->id]=	@$purchaseRate->rate;
-					}
-					
-					
-				//	pr($remaining); 
-				}	
-			} 
-		//}
-		//pr($remaining); exit;
+		          $data = $this->getdata($item->id,$company_id,$session_location_id,$to_date,$total,$remaining,$unit_rate);
+		           $remaining = $data[0];
+		            $unit_rate = $data[1];
+				}
+		    }
+		  
+		   
+		   
+		}
+		
 		$companies=$this->ItemLedgers->Companies->find()->contain(['States'])->where(['Companies.id'=>$company_id])->first();
 	
 		$stockGroups = $this->ItemLedgers->Items->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id,'StockGroups.parent_id IS NULL']);
 		$stockSubgroups=$this->ItemLedgers->Items->StockGroups->find('list')->where(['StockGroups.company_id'=>$company_id]);
-        $this->set(compact('companies','status','url','stockGroups','unit_rate','remaining','Items','stockGroups','to_date','stockSubgroups','stock_sub_group_id','stock_group_id','total','first_time'));
-        $this->set('_serialize', ['itemLedgers']);
+		$stockItems=$this->ItemLedgers->Items->find('list')->where(['Items.company_id'=>$company_id]);
+        $this->set(compact('companies','status','url','stockGroups','unit_rate','remaining','Items','stockItems','stockGroups','to_date','stockSubgroups','stock_sub_group_id','stock_group_id','total','first_time'));
+        $this->set('_serialize', ['itemLedgers','Items','remaining']);
+    }
+	
+	public function getdata($item_id,$company_id,$session_location_id,$to_date,$total,$remaining,$unit_rate){
+	   
+					
+					$purchaseRate=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$item_id,'ItemLedgers.status'=>'in','ItemLedgers.grn_id >'=>0])->first();
+					//pr($purchaseRate->rate); exit;
+					
+					$queryIn=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$item_id,'ItemLedgers.status'=>'in']);
+					$queryIn->select(['item_id','totalIn' => $queryIn->func()->sum('ItemLedgers.quantity')])->group('ItemLedgers.item_id');
+					
+					$queryOut=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$item_id,'ItemLedgers.status'=>'out']);
+					$queryOut->select(['item_id','totalOut' => $queryOut->func()->sum('ItemLedgers.quantity')])->group('ItemLedgers.item_id');
+					
+					$due=(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut);
+					
+				if($total=='Zero' && @$due == 0){ 
+						$remaining[$item_id]=round(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut,2);
+						$unit_rate[$item_id]=	0;
+					}else if($total=='Positive' && @$due > 0){
+						$remaining[$item_id]=round(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut,2);
+						$unit_rate[$item_id]=	@$purchaseRate->rate;
+					}else if($total=='All'){ 
+						$remaining[$item_id]=round(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut,2);
+						$unit_rate[$item_id]=	@$purchaseRate->rate;
+					}
+			
+			
+			$a=[];
+		    $a[]=$remaining;
+		    $a[]=$unit_rate; 
+		    return ($a);
+	}
+	
+public function excelExport(){
+	
+	     $this->viewBuilder()->layout('excel_layout');
+		$total=$this->request->query('total'); 
+		
+		$company_id=$this->Auth->User('session_company_id');
+		$session_location_id =$this->Auth->User('session_location_id');
+		$stock_group_id = $this->request->query('stock_group_id');
+		$stock_sub_group_id = $this->request->query('stock_subgroup_id');
+		$item_id = $this->request->query('item_id');
+		
+		$first_time="Yes";
+		
+		$where=[];
+		if(!empty($stock_group_id)){
+			$first_time="No";
+			$Groups[]=$stock_group_id;
+		$stockGroups = $this->ItemLedgers->Items->StockGroups->find('children', ['for' => $stock_group_id]);
+		foreach($stockGroups as $stockGroup){
+			$Groups[]=$stockGroup->id;
+		}
+		//pr($stockGroup->toArray()); exit;
+		$where['Items.stock_group_id In']=$Groups;
+		}
+		if(empty($total)){ 
+			$total='All';
+			
+		}
+		if(!empty($stock_sub_group_id)){
+			$first_time="No";
+			$where['Items.stock_group_id']=$stock_sub_group_id;
+		}
+		if(!empty($item_id)){
+			$first_time="No";
+			$where['Items.id']=$item_id;
+		}
+		$to_date   = $this->request->query('to_date');
+		if(!empty($to_date)){  
+			$first_time="No";
+			$to_date   = date("Y-m-d",strtotime($to_date));
+		}
+		else{
+			$to_date   = date("Y-m-d");
+		}
+		
+		
+		
+		
+		if($first_time=="No"){ 
+			 $Items=$this->ItemLedgers->Items->find()->contain(['Shades','Sizes','StockGroups'=>['ParentStockGroups']])->where($where)->where(['Items.company_id'=>$company_id ,'Items.created_on <='=>$to_date]); 
+			 $ItemsDatas=$this->ItemLedgers->Items->find()->contain(['Shades','Sizes','StockGroups'=>['ParentStockGroups']])->where($where)->where(['Items.company_id'=>$company_id ,'Items.created_on <='=>$to_date]); 
+		    $remaining=[];$unit_rate=[];
+		    foreach($ItemsDatas as $item){
+		        $dataexist=$this->ItemLedgers->exists(['ItemLedgers.item_id'=>$item->id,'ItemLedgers.location_id'=>$session_location_id ]);
+				if($dataexist==1){ 
+		          $data = $this->getdata($item->id,$company_id,$session_location_id,$to_date,$total,$remaining,$unit_rate);
+		           $remaining = $data[0];
+		            $unit_rate = $data[1];
+				}
+		    }
+		  
+		   
+		   
+		}
+		$companies=$this->ItemLedgers->Companies->find()->contain(['States'])->where(['Companies.id'=>$company_id])->first();
+        $this->set(compact('companies','status','url','stockGroups','unit_rate','remaining','Items','stockItems','stockGroups','to_date','stockSubgroups','stock_sub_group_id','stock_group_id','total','first_time'));
+        $this->set('_serialize', ['itemLedgers','Items','remaining']);
 	}
 	
 	
@@ -312,7 +347,7 @@ class ItemLedgersController extends AppController
 		}else{ 
 			$this->viewBuilder()->layout('index_layout');
 		}
-		$company_id=$this->Auth->User('session_company_id');
+		$company_id=3;
 		$session_location_id =$this->Auth->User('session_location_id');
 		$stock_group_id = $this->request->query('stock_group_id');
 		$stock_sub_group_id = $this->request->query('stock_subgroup_id');
@@ -341,32 +376,51 @@ class ItemLedgersController extends AppController
 		
 		
 		//$x=['6176','6177','6173','6172','6174','6178','6179','6180','6025'];
-		
-			$Items=$this->ItemLedgers->Items->find()->where(['Items.company_id'=>$company_id ,'Items.created_on <='=>$to_date]); 
+			$y=0;
+			$n=0;
+			$i=0;
+			$Items=$this->ItemLedgers->Items->find()->where(['Items.company_id'=>$company_id ,'Items.created_on <='=>$to_date,'stock_finish'=>'Yes'])->order(['Items.id'=>'DESC'])->toArray(); 
+			//pr($Items); exit; 
 			
 			$remaining=[];$unit_rate=[];$stock=[];
 			foreach($Items as $Item){
-				$dataexist=$this->ItemLedgers->exists(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.location_id'=>$session_location_id,'item_stock_finish'=>'No']);
+				$dataexist=$this->ItemLedgers->exists(['ItemLedgers.item_id'=>$Item->id,'item_stock_finish'=>'Yes']);
 				if($dataexist==1){ 
 					
-					$queryIn=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'in']);
+					/* $queryIn=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'in']);
 					$queryIn->select(['item_id','totalIn' => $queryIn->func()->sum('ItemLedgers.quantity')])->group('ItemLedgers.item_id');
 					
-					$queryOut=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'out']);
+					$queryOut=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id,'ItemLedgers.status'=>'out']);
 					$queryOut->select(['item_id','totalOut' => $queryOut->func()->sum('ItemLedgers.quantity')])->group('ItemLedgers.item_id');
 					
 					$due=(@$queryIn->toArray()[0]->totalIn-@$queryOut->toArray()[0]->totalOut);
-					if($due <= 0){
+					if($due > 0){ 
 						$query7 = $this->ItemLedgers->query();
 						$query7->update()
-						->set(['item_stock_finish' => 'Yes'])
-						->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.location_id'=>$session_location_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id])
+						->set(['item_stock_finish' => 'No'])
+						->where(['ItemLedgers.company_id'=>$company_id,'ItemLedgers.transaction_date <='=>$to_date,'ItemLedgers.item_id'=>$Item->id])
 						->execute();
 						
-					}
-				}	
+						$query7 = $this->ItemLedgers->Items->query();
+						$query7->update()
+						->set(['stock_finish' => 'No'])
+						->where(['Items.company_id'=>$company_id,'Items.id'=>$Item->id])
+						->execute();
+						
+					}else{
+						$y++;
+					} */
+				}else{
+				   $query7 = $this->ItemLedgers->Items->query();
+						$query7->update()
+						->set(['stock_finish' => 'No'])
+						->where(['Items.company_id'=>$company_id,'Items.id'=>$Item->id])
+						->execute();
+				}
 			} 
-		
+		pr($n);
+		pr($y);
+		pr($i);
 		exit;
     }
 	

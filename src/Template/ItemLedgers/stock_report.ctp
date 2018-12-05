@@ -40,22 +40,28 @@ $this->set('title', 'Stock Report');
 					<span class="caption-subject font-green-sharp bold ">Stock Report</span>
 				</div>
 				<div class="actions">
-					<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/ItemLedgers/StockReport/'.@$url_excel.'&status=excel',['class' =>'btn btn-sm green tooltips pull-right','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+					<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/ItemLedgers/excelExport/'.@$url_excel,['class' =>'btn btn-sm green tooltips pull-right','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
 				</div>
 			</div>
 			<div class="portlet-body">
 			<form method="get">
 						<div class="row">
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="form-group">
 								<label>Stock Group</label>
 									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group','label'=>false,'empty'=>'-Stock Group-', 'options' => $stockGroups, 'value'=> $stock_group_id]); ?>
 								</div>
 							</div>
-							<div class="col-md-3 " id="account_sub_group_div">
+							<div class="col-md-2 " id="account_sub_group_div">
 								<div class="form-group">
 								<label>Stock Sub Group</label>
 									<?php echo $this->Form->control('stock_subgroup_id',['class'=>'form-control input-sm select2me stock_sub_group','label'=>false,'empty'=>'-Stock Group-', 'options' => $stockSubgroups, 'value'=>$stock_sub_group_id ]); ?>
+								</div>
+							</div>
+							<div class="col-md-2 " id="account_item">
+								<div class="form-group">
+								<label>Stock Item</label>
+									<?php echo $this->Form->control('item_id',['class'=>'form-control input-sm select2me item_id','label'=>false,'empty'=>'-Stock Item-', 'options' => $stockItems, 'value'=>$stock_sub_group_id ]); ?>
 								</div>
 							</div>
 							<div class="col-md-2">
@@ -85,6 +91,7 @@ $this->set('title', 'Stock Report');
 			
 			<?php if($first_time=="No"){ ?>
 				<div class="table-responsive">
+				     <?php $page_no=$this->Paginator->current('Items'); $page_no=($page_no-1)*50; ?>
 					<table class="table table-bordered table-hover table-condensed" border="1" id="main_tb">
 						<thead>
 							<tr>
@@ -103,10 +110,53 @@ $this->set('title', 'Stock Report');
 								
 							</tr>
 						</thead>
-						<tbody id="main_tbody" >
+						<tbody id="main_tbody" ><?php $sno = 1; 
+								foreach ($Items as $Item): 
+								 // pr($Item); exit;
+									if(@sizeof(@$remaining[$Item->id]) > 0){ 
+									 $qty=round(@$remaining[$Item->id],2);
+								?>
+									<tr class="tr1">
+											<td class="firstrow"><?php echo ++$page_no; ?></td>
+											<td ><button type="button"  class="btn btn-xs tooltips revision_hide show_data" id="<?= h($Item->id) ?>" value="" style="margin-left:5px;margin-bottom:2px;"><i class="fa fa-plus-circle"></i></button>
+											<button type="button" class="btn btn-xs tooltips revision_show" style="margin-left:5px;margin-bottom:2px; display:none;"><i class="fa fa-minus-circle"></i></button><?php echo $Item->name; ?></td>
+											<td><?php echo $Item->item_code; ?></td>
+											<td><?php echo $Item->hsn_code; ?></td>
+											<td><?php if(@$Item->stock_group_id) { echo @$Item->stock_group->parent_stock_group->name; } else{ echo 'Primary'; }?></td>
+											<td><?php if(@$Item->stock_group_id) { echo @$Item->stock_group->name; } else{ echo 'Primary'; }?></td>
+											<td><?php if(@$Item->size_id) { echo @$Item->size->name; } else { echo '-'; } ?></td>
+											<td><?php if(@$Item->shade_id){ echo @$Item->shade->name;  } else { echo '-'; } ?></td>
+											<td align="right"><?php 
+											echo $this->Form->input('total_qt', ['type' => 'hidden','class'=>'total_qt','value'=>$qty]); 
+											echo @$qty; ?></td>
+											 <td class="rightAligntextClass"><?=$this->Money->moneyFormatIndia($Item->sales_rate)?></td>
+											<td align="right"><?php echo @$unit_rate[$Item->id]; ?></td>
+											<td align="right"><?php echo @$unit_rate[$Item->id]*@$qty; ?></td><?php
+											@$closing_stock+= @$unit_rate[$Item->id]*@$qty; 
+										    @$total_qty+= @$qty; 
+											?>
+										
+											
+										</tr>
+									<?php  } endforeach ?>
+								 <tr class="last_tr">
+								 <td colspan="8" align="right">Closing Stock</td><td align="right"><?=@$total_qty ?></td>
+								 <td></td>
+								 <td></td>
+								
+								 <td class="rightAligntextClass"><?=$this->Money->moneyFormatIndia(@$closing_stock)?></td>
+								 </tr>
 								
 						</tbody>
 					</table>
+					<div class="paginator">
+                    <ul class="pagination">
+                        <?= $this->Paginator->prev('< ' . __('previous')) ?>
+                        <?= $this->Paginator->numbers() ?>
+                        <?= $this->Paginator->next(__('next') . ' >') ?>
+                    </ul>
+                    <p><?= $this->Paginator->counter() ?></p>
+                </div>
 				</div>	
 			<?php } ?>
 			</div>
@@ -114,7 +164,7 @@ $this->set('title', 'Stock Report');
 	</div>
 </div>
 
-		<input type="text" class="getstock" value="<?php echo $this->Url->build(['controller'=>'ItemLedgers','action'=>'getStocks']); ?>">
+		
 <!-- BEGIN PAGE LEVEL STYLES -->
 	<!-- BEGIN COMPONENTS PICKERS -->
 	<?php echo $this->Html->css('/assets/global/plugins/clockface/css/clockface.css', ['block' => 'PAGE_LEVEL_CSS']); ?>
@@ -171,25 +221,6 @@ $this->set('title', 'Stock Report');
 <?php
 	$js="
 	$(document).ready(function() {
-		var query_url = $('.getstock').val();
-		$.ajax({
-			type:'GET',
-			url: query_url,
-			success:function(d){
-				console.log(d);
-				var tr=$(d).clone();
-				$('#main_tb tbody.main_tbody').append(tr);
-			},
-			beforeSend: function(){
-				alert(2);
-			},
-			complete: function(){
-				alert(3);
-			}
-		});
-		
-		
-		
 		
 		$('.show_data').die().live('click',function() { 
 			var item_id=$(this).attr('id');
