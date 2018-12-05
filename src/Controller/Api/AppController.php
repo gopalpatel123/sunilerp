@@ -49,7 +49,7 @@ class AppController extends Controller
          $this->loadComponent('Sms');
 		
         $this->loadComponent('Flash');
-		 $this->loadComponent('Crud.Crud', [
+		/*  $this->loadComponent('Crud.Crud', [
             'actions' => [
                 'Crud.Index',
                 'Crud.View',
@@ -62,7 +62,7 @@ class AppController extends Controller
                 'Crud.ApiPagination',
                 'Crud.ApiQueryLog'
             ]
-        ]);
+        ]); */
 	
 		$this->loadComponent('Auth', [
 			 'authenticate' => [
