@@ -103,6 +103,11 @@ class ItemsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
 		]);
+		
+		$this->hasMany('ItemReviewRatings', [
+            'foreignKey' => 'item_id',
+            'joinType' => 'INNER'
+		]);
     }
 
     /**
