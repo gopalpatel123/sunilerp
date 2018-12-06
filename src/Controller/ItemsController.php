@@ -216,7 +216,7 @@ class ItemsController extends AppController
 				$data_to_encode = strtoupper($item->provided_item_code);
 			}
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
-            
+            pr($item);exit;
 			if ($this->Items->save($item))
 			{
 				if(!empty($item->item_image_rows)){

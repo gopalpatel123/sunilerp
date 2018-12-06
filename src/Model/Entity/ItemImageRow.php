@@ -8,7 +8,7 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property int $item_id
- * @property string $image_url
+ * @property string $image_path
  * @property string $status
  *
  * @property \App\Model\Entity\Item $item

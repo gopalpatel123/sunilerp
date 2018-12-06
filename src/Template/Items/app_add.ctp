@@ -342,8 +342,8 @@ rename_rows();
 			var i=0;
 			$('#file_table tbody tr').each(function(){ 
 				i++;
-$(this).find('td:nth-child(1) input.select_file').attr('name','item_image_rows['+i+'][image_url]')
-.attr('id','item_image_rows-'+i+'-image_url');
+$(this).find('td:nth-child(1) input.select_file').attr('name','item_image_rows['+i+'][image_path]')
+.attr('id','item_image_rows-'+i+'-image_path');
 $(this).find('td:nth-child(2) select.status').attr('name','item_image_rows['+i+'][status]')
 .attr('id','item_image_rows-'+i+'-status');		
 			});
