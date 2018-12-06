@@ -122,7 +122,7 @@ class AppWishListsController extends AppController
 			
 			if(!empty($app_customer_id)){
 				$AppWishLists=$this->AppWishLists->find()->where(['app_customer_id'=>$app_customer_id])
-				->contain(['AppWishListItems'=>['Items']]);
+				->contain(['AppWishListItems'=>['Items'=>['AppBrands']]]);
 				if($AppWishLists->toArray()){
 					$success = true;
 					$message = 'Data found';
