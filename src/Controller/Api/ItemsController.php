@@ -21,7 +21,7 @@ class ItemsController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['itemlist','itemdetail','ratingList']);
+        $this->Auth->allow(['itemlist','itemdetail','ratingList','deliverycheck']);
     }
 	public function itemlist(){
 			$limit=10;
@@ -321,9 +321,28 @@ class ItemsController extends AppController
 		 
 	}
 	
-	public function ratingList($item_id = null)
-
-	{
+	
+	public function deliverycheck(){
+		
+		$city_id=@$this->request->query['city_id'];
+		if(!empty($city_id)){
+			$DeliveryCharges=$this->Items->DeliveryCharges->find()->where(['DeliveryCharges.id'=>$city_id,'status'=>'Active'])->toArray();
+			if($DeliveryCharges){
+				$success = true;
+				$message = 'Data found';
+			}else{
+				$success = false;
+				$message = 'data not found';
+			}
+		}else{
+			$success = false;
+			$message = 'empty city_id';
+		}
+		$this->set(compact(['success','message','DeliveryCharges']));
+		$this->set('_serialize', ['success','message','DeliveryCharges']);
+	}
+	
+   public function ratingList($item_id = null){
 			$success = true;
 			$message = 'data found';
 			$item_id=@$this->request->query['item_id'];
