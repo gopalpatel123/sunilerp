@@ -21,7 +21,7 @@ class CartsController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['addtoCart','removeCart','cartList']);
+        $this->Auth->allow(['addtoCart','removeCart','cartList','addtoCartproduct']);
     }
 	
 	public function cartlistAdd($cart_id=null,$quantity=null){
@@ -55,16 +55,32 @@ class CartsController extends AppController
 		$Cart_id=@$this->request->query['cart_id'];
 		$quantity=@$this->request->query['quantity'];
 		$tag_name=@$this->request->query['tag'];
+		$delivery_charge="Free";
 		if(!empty($app_customer_id)){
 			
 			$Addresscount=$this->Carts->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0])->count();
-			if($Addresscount>0){ $Isaddress=true; }else{ $Isaddress=false;}
+			if($Addresscount>0){ 
+					/* $AppCustomerAddresses=$this->Carts->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0])->first();
+					$city_id=$AppCustomerAddresses->city_id; 
+					$DeliveryCharges=$this->Carts->DeliveryCharges->find()->where(['DeliveryCharges.city_id'=>$city_id])->first();
+					pr($DeliveryCharges);exit; */
+				$Isaddress=true;
+			}else{
+				$Isaddress=false;
+				}
 			
 			if($tag_name=='add'){ $this->cartlistAdd($Cart_id,$quantity); }
 			if($tag_name=='remove'){ $this->cartlistRemove($Cart_id); }
 			
 			$Cartdatas=$this->Carts->find()->where(['app_customer_id'=>$app_customer_id])->toArray();
 			if($Cartdatas){
+				$total_amount=0;
+				foreach($Cartdatas as $cartnew){
+					
+					$total_amount+=$cartnew->amount;
+				}
+				
+				
 				$Carts=$Cartdatas;
 				$success = true;
 				$message="Data found Successfully";
@@ -81,10 +97,54 @@ class CartsController extends AppController
 			
 		}
 		
-		$this->set(compact(['success','message','Isaddress','Carts']));
-		$this->set('_serialize', ['success','message','Isaddress','Carts']);
+		$this->set(compact(['success','message','Isaddress','total_amount','Carts']));
+		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts']);
 		
 	}
+	
+	
+	public function addtoCartproduct(){
+		
+		$app_customer_id=@$this->request->query['app_customer_id'];
+		$item_code=@$this->request->query['item_code'];
+		$shade_id=@$this->request->query['shade_id'];
+		$size_id=@$this->request->query['size_id'];
+		if(!empty($app_customer_id) and !empty($item_code) and !empty($shade_id) and !empty($size_id)){
+			
+			$Items=$this->Carts->Items->find()->where(['Items.item_code'=>$item_code,'Items.shade_id'=>$shade_id,'Items.size_id'=>$size_id])->first()->toArray();
+			$item_id=$Items['id'];
+			$sales_rate=$Items['sales_rate'];
+			$Cartsdatas=$this->Carts->find()->where(['Carts.app_customer_id'=>$app_customer_id,'Carts.item_id'=>$item_id])->toArray();
+			if(empty($Cartsdatas)){
+				
+				 $cart = $this->Carts->newEntity();
+				 $cart->app_customer_id=$app_customer_id;
+				 $cart->item_id=$item_id;
+				 $cart->quantity=1;
+				 $cart->rate=$sales_rate;
+				 $cart->amount=$sales_rate;
+				 $cart->cart_count=1;
+				 $this->Carts->save($cart);
+				  
+				 $success = true;
+				 $message="Item Added Successfully";
+				 
+			}else{
+				
+				 $success = true;
+				 $message="Item Added Successfully";
+			}
+			
+		}else{
+			
+			$success = false;
+		    $message="Empty customer id or item_code or shade_id or size_id";
+		}
+		
+		$this->set(compact(['success','message','Isaddress','Carts']));
+		$this->set('_serialize', ['success','message','Isaddress','Carts']);
+	}
+	
 	
 	public function addtoCart(){
 			$app_customer_id=@$this->request->query['app_customer_id'];

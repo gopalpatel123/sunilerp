@@ -132,10 +132,20 @@ class ItemsController extends AppController
 			$newest_orders=[];$price_orders=[];$discount_orders=[];
 			$shadeWhere=[];$sizeWhere=[];$discountWhere=[];$app_brandWhere=[];$price_range_starts=[];
 			$price_range_ends=[];
-			if(!empty($shade_id)){ $shadeWhere = ['shade_id' =>$shade_id]; }
-			if(!empty($size_id)){ $sizeWhere = ['size_id' =>$size_id]; }
+			if(!empty($shade_id)){ 
+				$shade_ids=explode(',',$shade_id);
+				$shadeWhere = ['shade_id IN' =>$shade_ids];
+			 }
+			if(!empty($size_id)){ 
+				$size_ids=explode(',',$size_id);
+				$sizeWhere = ['size_id IN' =>$size_ids]; 
+			}
+			
 			if(!empty($discount)){ $discountWhere = ['discount >=' =>$discount];}
-			if(!empty($app_brand_id)){ $app_brandWhere = ['app_brand_id' =>$app_brand_id];}
+			if(!empty($app_brand_id)){ 
+				$app_brand_ids=explode(',',$app_brand_id);
+				$app_brandWhere = ['app_brand_id IN' =>$app_brand_ids];
+			}
 			if(!empty($price_range)){ $price_range_starts = ['sales_rate >= ' =>$price_range];}
 			if(!empty($newest_order)){ $newest_orders = ['Items.id' =>$newest_order];}
 			if(!empty($price_order)){ $price_orders = ['Items.sales_rate' =>$price_order];}
@@ -251,7 +261,7 @@ class ItemsController extends AppController
 		// Item details 
 		
 			$Items=$this->Items->find()->where(['Items.id'=>$item_id])
-			->contain(['AppBrands','Sizes','Shades'])
+			->contain(['AppBrands','Sizes','Shades','ItemImageRows'])
 			 ->leftJoinWith('AppBrands')->first()->toArray();
 			 
 			$inWishList=$this->Items->AppWishListItems->find()
@@ -343,48 +353,57 @@ class ItemsController extends AppController
 	}
 	
    public function ratingList($item_id = null){
-			$success = true;
-			$message = 'data found';
-			$item_id=@$this->request->query['item_id'];
-		$averageRating = number_format(0,1);
-		$allpercentage =array();
-		$ratingLists = $this->Items->ItemReviewRatings->find();
-		$ratingLists->contain(['AppCustomers'=>function($q){ return $q->select(['name']);  } ])
-		->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0]);
-		//pr($ratingLists->toArray()); exit;
-		if(!empty($ratingLists->toArray())){
-			$ratingcount=sizeof($ratingLists->toArray());
-			 $ratingreviewsCount = $this->Items->ItemReviewRatings->find()
-			->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'ItemReviewRatings.comment !='=>''])->count();
-			$rating = $this->Items->ItemReviewRatings->find();
-			$rating->select(['averageRating' => $rating->func()->avg('rating')])
-			->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0]);
-				foreach ($rating as $ratingarr) {
-					$averageRating = number_format($ratingarr->averageRating,1);
-				}
+		$ratingcount=0;	
+		$ratingreviewsCount=0;	
+		$item_id=@$this->request->query['item_id'];
+			if(!empty($item_id)){
+					$averageRating = number_format(0,1);
+					$allpercentage =array();
+					$ratingLists = $this->Items->ItemReviewRatings->find();
+					$ratingLists->contain(['AppCustomers'=>function($q){ return $q->select(['name']);  } ])
+					->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0]);
+					//pr($ratingLists->toArray()); exit;
+					if(!empty($ratingLists->toArray())){
+						$ratingcount=sizeof($ratingLists->toArray());
+						 $ratingreviewsCount = $this->Items->ItemReviewRatings->find()
+						->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'ItemReviewRatings.comment !='=>''])->count();
+						$rating = $this->Items->ItemReviewRatings->find();
+						$rating->select(['averageRating' => $rating->func()->avg('rating')])
+						->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0]);
+							foreach ($rating as $ratingarr) {
+								$averageRating = number_format($ratingarr->averageRating,1);
+							}
 
-				$star1 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>1,'rating <'=>1.9])->all();
-				$star1count = $star1->count();
-				
-				$star2 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>2,'rating <'=>2.9])->all();
-				$star2count = $star2->count();
+							$star1 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>1,'rating <'=>1.9])->all();
+							$star1count = $star1->count();
+							
+							$star2 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>2,'rating <'=>2.9])->all();
+							$star2count = $star2->count();
 
-				$star3 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>3,'rating <'=>3.9])->all();
-				$star3count = $star3->count();
+							$star3 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>3,'rating <'=>3.9])->all();
+							$star3count = $star3->count();
 
-				$star4 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>4,'rating <'=>4.9])->all();
-				$star4count = $star4->count();
+							$star4 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating >='=>4,'rating <'=>4.9])->all();
+							$star4count = $star4->count();
 
-				$star5 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating'=>5])->all();
-				$star5count = $star5->count();
-			
-				$allpercentage[] = array("rating"=>5,"Count"=>$star5count);
-				$allpercentage[] = array("rating"=>4,"Count"=>$star4count);
-				$allpercentage[] = array("rating"=>3,"Count"=>$star3count);
-				$allpercentage[] = array("rating"=>2,"Count"=>$star2count);
-				$allpercentage[] = array("rating"=>1,"Count"=>$star1count);
-				
-			}
-			        $this->set(['success' => $success,'message'=>$message,'averageRating'=>$averageRating,'ratingLists' => $ratingLists,'percentage'=>$allpercentage,'_serialize' => ['success','message','averageRating','ratingLists','percentage']]);
+							$star5 = $this->Items->ItemReviewRatings->find()->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0,'rating'=>5])->all();
+							$star5count = $star5->count();
+						
+							$allpercentage[] = array("rating"=>5,"Count"=>$star5count);
+							$allpercentage[] = array("rating"=>4,"Count"=>$star4count);
+							$allpercentage[] = array("rating"=>3,"Count"=>$star3count);
+							$allpercentage[] = array("rating"=>2,"Count"=>$star2count);
+							$allpercentage[] = array("rating"=>1,"Count"=>$star1count);
+							$success = true;
+							$message = 'Data found';
+						}else{
+							$success = false;
+							$message = 'Data not found';
+						}	
+			}else{
+				$success = false;
+				$message = 'empty item_id';
+			}		
+			  $this->set(['success' => $success,'message'=>$message,'averageRating'=>$averageRating,'ratingcount'=>$ratingcount,'ratingreviewsCount'=>$ratingreviewsCount,'ratingLists' => $ratingLists,'percentage'=>$allpercentage,'_serialize' => ['success','message','averageRating','ratingLists','percentage','ratingcount','ratingreviewsCount']]);
 	}
 }

@@ -130,34 +130,42 @@ class AppCustomersController extends AppController
 			 $appCustomer = $this->AppCustomers->newEntity();
 			if ($this->request->is('post')) {
 				$exists_email = $this->AppCustomers->exists(['AppCustomers.email'=>$this->request->data['email']]);
+				$exists_mobile = $this->AppCustomers->exists(['AppCustomers.mobile'=>$this->request->data['mobile']]);
 				$image_url=@$this->request->data['image_url'];
 				if($exists_email==0){
-					$this->request->data['status']='Active';
-					$this->request->data['username']=$this->request->getData('email');
-					$this->request->data['mobile_verify']='Yes';
-					$appCustomer = $this->AppCustomers->patchEntity($appCustomer, $this->request->getData());
-					if($this->AppCustomers->save($appCustomer)) {
-						$item_error=@$image_url['error'];
-						if(!empty(@$image_url['tmp_name'])){
-							if(empty($item_error))
-							{
-								$item_ext=explode('/',$image_url['type']);
-								$item_item_image='customer'.time().'.'.$item_ext[1];
-								$keyname = 'Appcustomer/'.$appCustomer->id.'/'.$item_item_image;
-								$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
-								$AppCustomersdata=$this->AppCustomers->get($appCustomer->id);
-								$AppCustomersdata->image_url=$keyname;
-								$this->AppCustomers->save($AppCustomersdata);
-								
+					if($exists_mobile==0){
+						$this->request->data['status']='Active';
+						$this->request->data['username']=$this->request->getData('email');
+						$this->request->data['mobile_verify']='Yes';
+						$appCustomer = $this->AppCustomers->patchEntity($appCustomer, $this->request->getData());
+						if($this->AppCustomers->save($appCustomer)) {
+							$item_error=@$image_url['error'];
+							if(!empty(@$image_url['tmp_name'])){
+								if(empty($item_error))
+								{
+									$item_ext=explode('/',$image_url['type']);
+									$item_item_image='customer'.time().'.'.$item_ext[1];
+									$keyname = 'Appcustomer/'.$appCustomer->id.'/'.$item_item_image;
+									$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
+									$AppCustomersdata=$this->AppCustomers->get($appCustomer->id);
+									$AppCustomersdata->image_url=$keyname;
+									$this->AppCustomers->save($AppCustomersdata);
+									
+								}
 							}
+							$success = true;
+							$message = "The customer has been saved."; 
+							$AppCustomers=$this->AppCustomers->get($appCustomer->id);
+						}else{
+							$success = false;
+							$message = "The customer could not be saved. Please, try again"; 
+							$AppCustomers=(object)[];
+							
 						}
-						$success = true;
-						$message = "The customer has been saved."; 
-						$AppCustomers=$this->AppCustomers->get($appCustomer->id);
 					}else{
 						$success = false;
-						$message = "The customer could not be saved. Please, try again"; 
-						$AppCustomers=(object)[];
+						$message="Mobile is already taken"; 
+						$AppCustomers=(object)[]; 
 						
 					}
 				 }else{

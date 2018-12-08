@@ -45,6 +45,10 @@ class CartsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
         ]); 
+		$this->belongsTo('Items', [
+            'foreignKey' => 'item_id',
+            'joinType' => 'INNER'
+        ]); 
 		$this->belongsTo('AppCustomerAddresses');
     }
 
