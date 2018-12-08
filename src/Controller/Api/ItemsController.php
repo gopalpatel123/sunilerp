@@ -361,7 +361,8 @@ class ItemsController extends AppController
 					$allpercentage =array();
 					$ratingLists = $this->Items->ItemReviewRatings->find();
 					$ratingLists->contain(['AppCustomers'=>function($q){ return $q->select(['name']);  } ])
-					->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0]);
+					->where(['ItemReviewRatings.item_id'=>$item_id,'ItemReviewRatings.status'=>0])
+					->order(['ItemReviewRatings.id'=>'DESC']);
 					//pr($ratingLists->toArray()); exit;
 					if(!empty($ratingLists->toArray())){
 						$ratingcount=sizeof($ratingLists->toArray());
