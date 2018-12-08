@@ -130,34 +130,42 @@ class AppCustomersController extends AppController
 			 $appCustomer = $this->AppCustomers->newEntity();
 			if ($this->request->is('post')) {
 				$exists_email = $this->AppCustomers->exists(['AppCustomers.email'=>$this->request->data['email']]);
+				$exists_mobile = $this->AppCustomers->exists(['AppCustomers.mobile'=>$this->request->data['mobile']]);
 				$image_url=@$this->request->data['image_url'];
 				if($exists_email==0){
-					$this->request->data['status']='Active';
-					$this->request->data['username']=$this->request->getData('email');
-					$this->request->data['mobile_verify']='Yes';
-					$appCustomer = $this->AppCustomers->patchEntity($appCustomer, $this->request->getData());
-					if($this->AppCustomers->save($appCustomer)) {
-						$item_error=@$image_url['error'];
-						if(!empty(@$image_url['tmp_name'])){
-							if(empty($item_error))
-							{
-								$item_ext=explode('/',$image_url['type']);
-								$item_item_image='customer'.time().'.'.$item_ext[1];
-								$keyname = 'Appcustomer/'.$appCustomer->id.'/'.$item_item_image;
-								$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
-								$AppCustomersdata=$this->AppCustomers->get($appCustomer->id);
-								$AppCustomersdata->image_url=$keyname;
-								$this->AppCustomers->save($AppCustomersdata);
-								
+					if($exists_mobile==0){
+						$this->request->data['status']='Active';
+						$this->request->data['username']=$this->request->getData('email');
+						$this->request->data['mobile_verify']='Yes';
+						$appCustomer = $this->AppCustomers->patchEntity($appCustomer, $this->request->getData());
+						if($this->AppCustomers->save($appCustomer)) {
+							$item_error=@$image_url['error'];
+							if(!empty(@$image_url['tmp_name'])){
+								if(empty($item_error))
+								{
+									$item_ext=explode('/',$image_url['type']);
+									$item_item_image='customer'.time().'.'.$item_ext[1];
+									$keyname = 'Appcustomer/'.$appCustomer->id.'/'.$item_item_image;
+									$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
+									$AppCustomersdata=$this->AppCustomers->get($appCustomer->id);
+									$AppCustomersdata->image_url=$keyname;
+									$this->AppCustomers->save($AppCustomersdata);
+									
+								}
 							}
+							$success = true;
+							$message = "The customer has been saved."; 
+							$AppCustomers=$this->AppCustomers->get($appCustomer->id);
+						}else{
+							$success = false;
+							$message = "The customer could not be saved. Please, try again"; 
+							$AppCustomers=(object)[];
+							
 						}
-						$success = true;
-						$message = "The customer has been saved."; 
-						$AppCustomers=$this->AppCustomers->get($appCustomer->id);
 					}else{
 						$success = false;
-						$message = "The customer could not be saved. Please, try again"; 
-						$AppCustomers=(object)[];
+						$message="Mobile is already taken"; 
+						$AppCustomers=(object)[]; 
 						
 					}
 				 }else{
@@ -225,10 +233,10 @@ class AppCustomersController extends AppController
 							->where(['id' => $appCustomer->id])
 							->execute();
 						}
-						
+						$AppCustomers = $this->AppCustomers->get($appCustomer->id);
 						$success = true;
 						$message = 'profile updated';
-						$error_msg=[];
+						//$error_msg=[];
 					}else{
 						if($appCustomer->errors()){
 							$error_msg = [];
@@ -245,7 +253,7 @@ class AppCustomersController extends AppController
 
 							if(!empty($error_msg)){
 								$success = false;
-								$message = "Please fix the following error(s):";
+								$message = $error_msg;
 								
 							}
 						}
@@ -255,11 +263,11 @@ class AppCustomersController extends AppController
 			}else{
 				$success = false;
 				$message = "No Data Found";
-				$error_msg=[];
+				//$error_msg=[];
 			}
 			
-		$this->set(compact(['error_msg','success','message']));
-		$this->set('_serialize', ['success','message','error_msg']);	
+		$this->set(compact(['error_msg','success','message','AppCustomers']));
+		$this->set('_serialize', ['success','message','error_msg','AppCustomers']);	
 			
 		}
 		

@@ -22,6 +22,11 @@ $this->set('title', 'Create Shade');
 							<?php echo $this->Form->control('name',['class'=>'form-control input-sm','placeholder'=>'Shade Name',
 							'label'=>false,'autofocus','required']); ?>
 						</div>
+						<div class="form-group">
+							<label>Shade Code <span class="required">*</span></label>
+							<?php echo $this->Form->control('name',['class'=>'form-control input-sm','placeholder'=>'Shade Name',
+							'label'=>false,'autofocus','required']); ?>
+						</div>
 						<div class="row"><span class="loading"></span>
 							<div class="col-md-6">
 								<div class="form-group">

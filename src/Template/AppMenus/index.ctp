@@ -28,8 +28,8 @@ $this->set('title', 'App Menus');
 							<th scope="col"><?= $this->Paginator->sort('Sr.no') ?></th>
 							<th scope="col"><?= $this->Paginator->sort('Name') ?></th>
 							<th scope="col"><?= $this->Paginator->sort('link') ?></th>
-							<th scope="col"><?= $this->Paginator->sort('parent') ?></th>
 							<th scope="col"><?= $this->Paginator->sort('Title content') ?></th>
+							<th scope="col"><?= $this->Paginator->sort('Status') ?></th>
 							<th scope="col" class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>
@@ -40,12 +40,12 @@ $this->set('title', 'App Menus');
 							<td><?= h(++$i) ?></td>
 							<td><?= h($appMenu->name) ?></td>
 							<td><?= h($appMenu->link) ?></td>
-							 <td><?= $appMenu->has('parent_app_menu') ? $appMenu->parent_app_menu->name : '' ?></td>
 							<td><?= h($appMenu->title_content) ?></td>
+							<td><?= h($appMenu->status) ?></td>
 							<td class="actions">
 								
 								<?= $this->Html->link(__('Edit'), ['action' => 'edit', $appMenu->id]) ?>
-								<?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $appMenu->id], ['confirm' => __('Are you sure you want to delete ?', $appMenu->id)]) ?>
+								<!--<?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $appMenu->id], ['confirm' => __('Are you sure you want to delete ?', $appMenu->id)]) ?>-->
 							</td>
 						</tr>
 						<?php endforeach; ?>

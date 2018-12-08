@@ -221,7 +221,7 @@ $this->set('title', 'Edit Item');
 							</div>
 							<div class="col-md-4">
 								<div class="form-group hide_gst" <?php echo @$style;?>>
-									<label style="font-size: 10px;">Gst Greter than to Amount </label>
+									<label style="font-size: 10px;">Gst Greater than to Amount </label>
 									<?php echo $this->Form->control('second_gst_figure_id',['class'=>'form-control input-sm ','label'=>false,'empty'=>'-GST Figure-', 'options' => $gstFigures]); ?>
 								</div>
 							</div>
@@ -237,12 +237,57 @@ $this->set('title', 'Edit Item');
 						</div>	
 					</div>
 				</div>
+				<div class="col-md-12 ">
+					<div class="row" >
+						<div class="form-group"><label><b>Add Multiple Image</b></label>
+							<table id="file_table" style="line-height:2.5">
+								<?php $i=0; foreach($item->item_image_rows as $item_image_row){ ?>
+								<tr class="tr1">
+							
+<?php echo $this->Form->control('item_image_rows['.$i.'][image_path_exist]',['class'=>'form-control input-sm','label'=>false, 'type' =>'hidden','value'=>$item_image_row->image_path]);?>
+									<td>
+								<?php echo $this->Form->control('item_image_rows['.$i.'][image_path]',['class'=>'form-control input-sm select_file','label'=>false, 'type' =>'file','value'=>$item_image_row->image_path]); ?>
+									</td>
+									<td>
+										<?php 
+										$option['Active']='Active';
+										$option['Deactive']='Deactive';
+										echo $this->Form->control('item_image_rows['.$i.'][status]',['class'=>'form-control input-sm select2me status','label'=>false,'empty'=>'-select-', 'options' => $option,'value'=>$item_image_row->status]); ?>
+									</td>
+									<td>
+										<?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-plus']) . __(''), ['class'=>'btn btn-block btn-primary btn-sm add_more','type'=>'button']) ?>
+									</td>
+									<td style="padding: 5px;">
+			<?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-trash']) . __(''), ['class'=>'btn btn-block btn-danger btn-sm delete_row','type'=>'button']) ?></td>
+								</tr>
+								<?php $i++;} ?>
+							</table>
+						</div>	
+					</div>
+				</div>
 				<?= $this->Form->button(__('Submit'),['class'=>'btn btn-success']) ?>
 				<?= $this->Form->end() ?>
 			</div>
 		</div>
 	</div>
 </div>
+<table id="copy_row" style="display:none;">	
+	<tbody>
+		<tr>
+			<td><?php echo $this->Form->control('q',['class'=>'form-control input-sm select_file','label'=>false, 'type' =>'file']); ?></td>
+			<td>
+				<?php 
+				$option['Active']='Active';
+				$option['Deactive']='Deactive';
+				echo $this->Form->control('q',['class'=>'form-control input-sm select2me status','label'=>false,'empty'=>'-select-', 'options' => $option,'value'=>'Active']); ?>
+			</td>
+			<td><?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-plus']) . __(''), ['class'=>'btn btn-block btn-primary btn-sm add_more','type'=>'button']) ?>
+			</td>
+			<td style="padding: 5px;">
+			<?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-trash']) . __(''), ['class'=>'btn btn-block btn-danger btn-sm delete_row','type'=>'button']) ?></td>
+		</tr>
+	</tbody>
+</table>
 <!-- BEGIN PAGE LEVEL STYLES -->
 	<!-- BEGIN COMPONENTS PICKERS -->
 	<?php echo $this->Html->css('/assets/global/plugins/clockface/css/clockface.css', ['block' => 'PAGE_LEVEL_CSS']); ?>
@@ -300,6 +345,28 @@ $this->set('title', 'Edit Item');
 	  $('.reverseCalculation').die().live('keyup',function(){
 		   reverce_amt_calc();
 	  });
+	  $(document).on('click','button.add_more',function() {
+				var row=$('#copy_row tbody').html();
+				$('#file_table tbody').append(row);
+				rename_rows();
+			});
+	  	$(document).on('click','button.delete_row',function() {
+			$(this).closest('tr').remove();
+		});
+		
+		rename_rows();
+		function rename_rows(){ 
+			var list = new Array();
+			var p=0;
+			var i=0;
+			$('#file_table tbody tr').each(function(){ 
+				i++;
+$(this).find('td:nth-child(1) input.select_file').attr('name','item_image_rows['+i+'][image_path]')
+.attr('id','item_image_rows-'+i+'-image_path');
+$(this).find('td:nth-child(2) select.status').attr('name','item_image_rows['+i+'][status]')
+.attr('id','item_image_rows-'+i+'-status');		
+			});
+		}
 	  function amt_calc()
 	  {
 		  var qty = $('.qty').val();

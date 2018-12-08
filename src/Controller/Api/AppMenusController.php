@@ -14,6 +14,7 @@ class AppMenusController extends AppController
         parent::initialize();
         $this->Auth->allow(['getAppMenus']);
     }
+	
 	 public function getAppMenus()
     {
 
@@ -25,11 +26,11 @@ class AppMenusController extends AppController
 		$menu=[];$others=[];$AppMenus=[];
          if(@sizeof(@$AppMenusDatas) > 0){     
 			foreach($AppMenusDatas as $appmenu){ 
-			
-				$childrenDatas = $this->AppMenus->StockGroups
+				if(!empty($appmenu['stock_group_id'])){
+					$childrenDatas = $this->AppMenus->StockGroups
 							->find('children',['for'=>$appmenu['stock_group_id']])
 							->find('threaded')->where(['is_status'=>'app']);
-				
+				}
 				
 				if($appmenu->title_content == "Menu"){
 					$menu[] = $appmenu;

@@ -63,7 +63,27 @@ class AppMenusController extends AppController
         if ($this->request->is('post')) {
 			
             $appMenu = $this->AppMenus->patchEntity($appMenu, $this->request->getData());
+			$menu_icon=$this->request->getData('menu_icon');
             if ($this->AppMenus->save($appMenu)) {
+				if(!empty($menu_icon['tmp_name'])){
+						$item_error=$menu_icon['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$menu_icon['type']);
+								$item_item_image='menuicon'.time().'.'.$item_ext[1];
+							}
+				
+						$keyname = 'MenuIcon/'.$appMenu->id.'/'.$item_item_image;
+						$this->AwsFile->putObjectFile($keyname,$menu_icon['tmp_name'],$menu_icon['type']);
+				
+					$query = $this->AppMenus->query();
+					$query->update()
+					->set([
+						'menu_icon' => $keyname
+						])
+					->where(['id' => $appMenu->id])
+					->execute();
+				}
                 $this->Flash->success(__('The app menu has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
@@ -92,7 +112,50 @@ class AppMenusController extends AppController
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $appMenu = $this->AppMenus->patchEntity($appMenu, $this->request->getData());
+			$menu_icon=$this->request->getData('menu_icon');
+			$menu_icon_exist=$this->request->getData('menu_icon_exist');
+			
+			
+				if(!empty($menu_icon['tmp_name']))
+				{
+					$this->request->data['menu_icon']=$menu_icon;			 
+				}
+				else
+				{
+					if(!empty($this->request->data['menu_icon_exist']))
+					{
+						$appMenu->menu_icon=$menu_icon_exist;	
+					}
+					else
+					{
+						$appMenu->menu_icon='';
+					}
+				}
             if ($this->AppMenus->save($appMenu)) {
+				if(!empty($menu_icon['tmp_name'])){
+						$item_error=$menu_icon['error'];
+						if(empty($item_error))
+							{
+								$item_ext=explode('/',$menu_icon['type']);
+								$item_item_image='menuicon'.time().'.'.$item_ext[1];
+							}
+						if(empty($files['error']))
+						{
+							$keyname = 'MenuIcon/'.$appMenu->id.'/'.$item_item_image;
+							$this->AwsFile->putObjectFile($keyname,$menu_icon['tmp_name'],$menu_icon['type']);
+							if(!empty($menu_icon_exist)){
+								$this->AwsFile->deleteMatchingObjects($menu_icon_exist);
+							}
+							
+						}
+					$query = $this->AppMenus->query();
+					$query->update()
+					->set([
+						'menu_icon' => $keyname
+						])
+					->where(['id' => $appMenu->id])
+					->execute();
+				}
                 $this->Flash->success(__('The app menu has been saved.'));
 
                 return $this->redirect(['action' => 'index']);

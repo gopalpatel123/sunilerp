@@ -216,27 +216,27 @@ class ItemsController extends AppController
 				$data_to_encode = strtoupper($item->provided_item_code);
 			}
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
-            pr($item);exit;
+          // pr($this->request->getData('item_image_rows'));exit;
 			if ($this->Items->save($item))
 			{
-				if(!empty($item->item_image_rows)){
-					foreach($item->item_image_rows as $item_image_row){ 
-						if(!empty($item_image_row['image_url']['tmp_name'])){
-							$item_errors=$item_image_row['image_url']['error'];
+				if(!empty($this->request->getData('item_image_rows'))){
+					foreach($this->request->getData('item_image_rows') as $item_image_row){ 
+						if(!empty($item_image_row['image_path']['tmp_name'])){
+							$item_errors=$item_image_row['image_path']['error'];
 							if(empty($item_errors))
 							{
-								$item_extt=explode('/',$item_image_row['image_url']['type']);
+								$item_extt=explode('/',$item_image_row['image_path']['type']);
 								$item_item_images='itemrows'.time().'.'.$item_extt[1];
 							}
 							
-							$keyname1 = 'ItemRows/'.$item->id.'/'.$item_item_images;
-							$this->AwsFile->putObjectFile($keyname1,$item_image_row['image_url']['tmp_name'],$item_image_row['image_url']['type']);
+							$keyname1 = 'ItemRows/'.$item_image_row->id.'/'.$item_item_images;
+							$this->AwsFile->putObjectFile($keyname1,$item_image_row['image_path']['tmp_name'],$item_image_row['image_path']['type']);
 						}
 						$query = $this->Items->ItemImageRows->query();
-						$query->insert(['item_id', 'image_url','status'])
+						$query->insert(['item_id', 'image_path','status'])
 						->values([
 									'item_id' => $item->id,
-									'image_url' => $keyname1,
+									'image_path' => $keyname1,
 									'status' => 'Active'
 									]);
 						$query->execute(); 	
@@ -335,7 +335,7 @@ class ItemsController extends AppController
         $item = $this->Items->get($id, [
             'contain' => ['ItemLedgers' => function($q) {
 				return $q->where(['ItemLedgers.is_opening_balance'=>'yes']);
-			}]
+			},'ItemImageRows']
         ]);
         $itemPurchaseData=$this->Items->ItemLedgers->find()->where(['item_id'=>$id,'status'=>'In','grn_id > '=>0])->select('rate')->first();
         $itemPurchaseRate=@$itemPurchaseData->rate;
@@ -374,9 +374,39 @@ class ItemsController extends AppController
 				$item->gst_amount           = 0;
 			}
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
-			
+			//pr($item);exit;
 			if ($this->Items->save($item)) {
 				
+				if(!empty($this->request->getData('item_image_rows'))){
+						$this->Items->ItemImageRows->deleteAll(['item_id'=>$item->id]);
+					foreach($this->request->getData('item_image_rows') as $item_image_row){ 
+					
+						$image_path_exist = $item_image_row['image_path_exist'];
+						if(!empty($item_image_row['image_path']['tmp_name'])){
+							$item_errors=$item_image_row['image_path']['error'];
+							if(empty($item_errors))
+							{
+								$item_extt=explode('/',$item_image_row['image_path']['type']);
+								$item_item_images='itemrows'.time().'.'.$item_extt[1];
+							}
+							
+							$keyname1 = 'ItemRows/'.$item->id.'/'.$item_item_images;
+							$this->AwsFile->putObjectFile($keyname1,$item_image_row['image_path']['tmp_name'],$item_image_row['image_path']['type']);
+							if(!empty($image_path_exist)){
+								$this->AwsFile->deleteMatchingObjects($image_path_exist);
+							}
+						}
+					
+						$query = $this->Items->ItemImageRows->query();
+						$query->insert(['item_id', 'image_path','status'])
+						->values([
+									'item_id' => $item->id,
+									'image_path' => $keyname1,
+									'status' => 'Active'
+									]);
+						$query->execute(); 	
+					}
+				}
 				
 				if(!empty($image_url['tmp_name'])){
 						$item_error=$image_url['error'];
@@ -389,7 +419,10 @@ class ItemsController extends AppController
 						{
 							$keyname = 'Item/'.$item->id.'/'.$item_item_image;
 							$this->AwsFile->putObjectFile($keyname,$image_url['tmp_name'],$image_url['type']);
-							$this->AwsFile->deleteMatchingObjects($image_url_exist);
+							if(!empty($image_url_exist)){
+								$this->AwsFile->deleteMatchingObjects($image_url_exist);
+							}
+							
 						}
 					$query = $this->Items->query();
 					$query->update()

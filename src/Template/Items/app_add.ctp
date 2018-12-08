@@ -14,7 +14,7 @@ $this->set('title', 'Create Item');
 				</div>
 			</div>
 			<div class="portlet-body">
-				<?= $this->Form->create($item,['onsubmit'=>'return checkValidation()','allow_to_submit'=>'0','id'=>'CreateItem','type'=>'file']) ?>
+				<?= $this->Form->create($item,['id'=>'CreateItem','type'=>'file']) ?>
 				<div class="row">
 					<div class="col-md-6">
 					    <div class="form-group">
