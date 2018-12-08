@@ -18,7 +18,8 @@ $this->set('title', 'Shades');
 					<thead>
 						<tr>
 							<th scope="col"><?= $this->Paginator->sort('Sr') ?></th>
-							<th scope="col"><?= $this->Paginator->sort('name') ?></th>
+							<th scope="col"><?= $this->Paginator->sort('Name') ?></th>
+							<th scope="col"><?= $this->Paginator->sort('Code') ?></th>
 							<th scope="col" class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>
@@ -29,6 +30,7 @@ $this->set('title', 'Shades');
 						<tr>
 							<td><?php echo $i; ?></td>
 							<td><?= h($shade->name) ?></td>
+							<td><?= h($shade->color_code) ?></td>
 							<td class="actions"><?php if (in_array("63", $userPages)){?>
 								<?= $this->Html->link(__('Edit'), ['action' => 'edit', $shade->id]) ?>
 							<?php }?>

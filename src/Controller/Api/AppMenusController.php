@@ -37,12 +37,13 @@ class AppMenusController extends AppController
 					unset($appmenu->parent_stock_group);
 					$appmenu->child_categories = $childrenDatas;
 				}else if($appmenu->title_content == "Others"){
-					$menu[] = $appmenu;
+					$others[] = $appmenu;
 					unset($appmenu->parent_stock_group);
 				}
 			}
     		
 			array_push($AppMenus,array('header_name'=>'Menu','title'=>$menu));
+			array_push($AppMenus,array('header_name'=>'Others','title'=>$others));
 			
 			$success = true;   $message = 'Menus Data Found Successfully';  
     	}else{    
