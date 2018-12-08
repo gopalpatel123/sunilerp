@@ -46,26 +46,42 @@ class AppWishListsController extends AppController
 					$this->AppWishLists->AppWishListItems->save($AppWishListItems);
 					$success = true;
 					$message = 'Item added to wish list';
-				   
+				    $is_added=true;
 				}else{
 					
 					$success = false;
-					$message = 'not successfully added';
+					$message = 'Item is not added';
+					$is_added=false;
 				}
 			}else{
 					$AppWishLists=$this->AppWishLists->find()->where(['app_customer_id'=>$app_customer_id])->first();
-					$AppWishListItems = $this->AppWishLists->AppWishListItems->newEntity();
-					$AppWishListItems->app_wish_list_id=$AppWishLists->id;
-					$AppWishListItems->item_id=$item_id;
-					$AppWishListItems->item_code=$item_code;
-					$AppWishListItems->status=0;
-					$this->AppWishLists->AppWishListItems->save($AppWishListItems);
 					
-				$success = true;
-				$message = 'Item added to wish list';
+					$exists_items = $this->AppWishLists->AppWishListItems->exists(['AppWishListItems.app_wish_list_id'=>$AppWishLists->id,'AppWishListItems.item_id'=>$item_id]);
+					if($exists_items==0){
+						
+						$AppWishListItems = $this->AppWishLists->AppWishListItems->newEntity();
+						$AppWishListItems->app_wish_list_id=$AppWishLists->id;
+						$AppWishListItems->item_id=$item_id;
+						$AppWishListItems->item_code=$item_code;
+						$AppWishListItems->status=0;
+						$this->AppWishLists->AppWishListItems->save($AppWishListItems);
+					
+						$success = true;
+						$message = 'Item added to wish list';
+						$is_added=true;
+						
+					}else{
+						$AppWishListItemsremove=$this->AppWishLists->AppWishListItems->find()->where(['AppWishListItems.app_wish_list_id'=>$AppWishLists->id,'AppWishListItems.item_id'=>$item_id])->first();
+						$this->AppWishLists->AppWishListItems->delete($AppWishListItemsremove);
+						$success = true;
+						$message = 'removed from wish list';
+						$is_added=false;
+						
+					}
+					
 			}
-            $this->set(compact(['Items','success','message']));
-			$this->set('_serialize', ['success','message','Items']);
+            $this->set(compact(['Items','success','message','is_added']));
+			$this->set('_serialize', ['success','message','Items','is_added']);
         }
       
     }
