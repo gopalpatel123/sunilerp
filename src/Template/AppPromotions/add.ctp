@@ -23,7 +23,7 @@ $this->set('title', 'Create AppPromotions');
 						</div>
 					</div>
 					
-					<div class="col-md-6">
+					<div class="col-md-4">
 						<div class="form-group">
 							<label>Offer Start From To<span class="required">*</span></label>
 							<div class="input-group input-large date-picker input-daterange" data-date="10/11/2012" data-date-format="mm/dd/yyyy">
@@ -34,15 +34,7 @@ $this->set('title', 'Create AppPromotions');
 							</div>
 						</div>	
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-					    <div class="form-group">
-							<label>Offer Description <span class="required">*</span></label>
-							<?php echo $this->Form->textarea('description',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'']); ?>
-						</div>
-					</div>
-					<div class="col-md-6">
+					<div class="col-md-2">
 									<div class="form-group">
 										<label>Status</label>
 										<?php 
@@ -52,6 +44,15 @@ $this->set('title', 'Create AppPromotions');
 										echo $this->Form->control('status',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Status-', 'options' => $status]); ?>
 									</div>
 								</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+					    <div class="form-group">
+							<label>Offer Description <span class="required">*</span></label>
+							<?php echo $this->Form->control('description',['class'=>'form-control input-sm','label'=>false,'rows'=>'2','id'=>'summernote_1']); ?>
+						</div>
+					</div>
+					
 				</div>	
 				<div class="row">
 					<div class="col-md-12">
@@ -145,6 +146,7 @@ $this->set('title', 'Create AppPromotions');
 	<?php echo $this->Html->script('/assets/admin/layout/scripts/quick-sidebar.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
 	<?php echo $this->Html->script('/assets/admin/layout/scripts/demo.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
 	<?php echo $this->Html->script('/assets/admin/pages/scripts/components-dropdowns.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
+	<?php echo $this->Html->script('https://cdn.ckeditor.com/4.4.3/standard/ckeditor.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
 	<!-- END COMPONENTS DROPDOWNS -->
 <!-- END PAGE LEVEL SCRIPTS -->
 
@@ -194,7 +196,7 @@ $this->set('title', 'Create AppPromotions');
 	$js="
 	$(document).ready(function() {
 		 ComponentsPickers.init();
-		 
+		 CKEDITOR.replace('description');
 		 
 		 
 		$('.delete-tr').die().live('click',function() 

@@ -26,12 +26,35 @@ class AppCustomerAddressesController extends AppController
 	public function fetchAddresses(){
 		
 	  $app_customer_id = $this->request->query('app_customer_id');
+	  $is_address = $this->request->query('is_address');
+	  $id = $this->request->query('id');
 	  $AppCustomerAddressesExists = $this->AppCustomerAddresses->exists(['app_customer_id' => $app_customer_id]);
 	  
 	  if($AppCustomerAddressesExists){
-		  $appcustomeraddresses = $this->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id]);
-			$success = true;
-			$message = 'data found';
+		  if($is_address == "delete"){
+			  $appCustomerAddress = $this->AppCustomerAddresses->get($id);
+				$appCustomerAddress->is_deleted =1;
+			//pr($appCustomerAddress);exit;
+			if ($this->AppCustomerAddresses->save($appCustomerAddress)) {
+				$success = true;
+				$message = "Data Deleted";
+				$appcustomeraddresses=[];
+			}else{
+				$success = false;
+				$message = "Data not Deleted";
+				$appcustomeraddresses=[];
+			}
+		  }else{
+			  $appcustomeraddresses = $this->AppCustomerAddresses->find()->contain(['Cities','States'])->where(['app_customer_id'=>$app_customer_id]);
+				if($appcustomeraddresses){
+					$success = true;
+					$message = 'data found';
+				}else{
+					$success = false;
+					$message = 'data not found';
+				}
+		  }
+		  
 	  }else{
 			$success = true;
 			$message = 'data found';
@@ -183,13 +206,7 @@ class AppCustomerAddressesController extends AppController
 		$id= $this->request->data('id');
 		$AppCustomerAddressesExists = $this->AppCustomerAddresses->exists(['id' => $id]);
 		if($AppCustomerAddressesExists){
-			$appCustomerAddress = $this->AppCustomerAddresses->get($id);
-			$appCustomerAddress->is_deleted =1;
-			//pr($appCustomerAddress);exit;
-			if ($this->AppCustomerAddresses->save($appCustomerAddress)) {
-				$success = true;
-				$message = "Data Deleted";
-			}
+			
 		}else{
 			$success = false;
 			$message = "No Data Found";

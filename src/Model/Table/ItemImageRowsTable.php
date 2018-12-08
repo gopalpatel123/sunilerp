@@ -54,9 +54,9 @@ class ItemImageRowsTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-        $validator
+      /*  $validator
             ->requirePresence('image_path', 'create')
-            ->notEmpty('image_path');
+            ->notEmpty('image_path');*/
 
         $validator
             ->requirePresence('status', 'create')

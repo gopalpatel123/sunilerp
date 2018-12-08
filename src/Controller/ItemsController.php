@@ -217,6 +217,7 @@ class ItemsController extends AppController
 			}
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
           // pr($this->request->getData('item_image_rows'));exit;
+		 // pr($this->request->getData('item_image_rows'));exit;
 			if ($this->Items->save($item))
 			{
 				if(!empty($this->request->getData('item_image_rows'))){
@@ -229,7 +230,7 @@ class ItemsController extends AppController
 								$item_item_images='itemrows'.time().'.'.$item_extt[1];
 							}
 							
-							$keyname1 = 'ItemRows/'.$item_image_row->id.'/'.$item_item_images;
+							$keyname1 = 'ItemRows/'.$item->id.'/'.$item_item_images;
 							$this->AwsFile->putObjectFile($keyname1,$item_image_row['image_path']['tmp_name'],$item_image_row['image_path']['type']);
 						}
 						$query = $this->Items->ItemImageRows->query();
@@ -376,7 +377,7 @@ class ItemsController extends AppController
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
 			//pr($item);exit;
 			if ($this->Items->save($item)) {
-				
+				//pr($this->request->getData('item_image_rows'));exit;
 				if(!empty($this->request->getData('item_image_rows'))){
 						$this->Items->ItemImageRows->deleteAll(['item_id'=>$item->id]);
 					foreach($this->request->getData('item_image_rows') as $item_image_row){ 
@@ -395,6 +396,10 @@ class ItemsController extends AppController
 							if(!empty($image_path_exist)){
 								$this->AwsFile->deleteMatchingObjects($image_path_exist);
 							}
+						}else{
+							
+							$keyname1 = $image_path_exist;
+							
 						}
 					
 						$query = $this->Items->ItemImageRows->query();

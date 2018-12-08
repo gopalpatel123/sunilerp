@@ -67,9 +67,10 @@ $this->set('title', 'Create Item');
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>Description </label>
-									<?php echo $this->Form->control('description',['class'=>'form-control input-sm','label'=>false,'rows'=>'2']); ?>
+									<label>Fabric Type </label>
+									 <?php echo $this->Form->control('fabric_type',['class'=>'form-control input-sm','label'=>false,'type'=>'text']); ?>
 								</div>
+								
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
@@ -86,6 +87,7 @@ $this->set('title', 'Create Item');
 								</div>
 							</div>
 						</div>
+						
 					</div>
 					<div class="col-md-6">
 						<span class="caption-subject bold " style="float:center;">Opening Balance</span><hr style="margin: 6px 0;">
@@ -112,29 +114,30 @@ $this->set('title', 'Create Item');
 						<div class="row">
 							<div class="col-md-4">
 								<div class="form-group">
-									<label>Sales Rate </label>
-									<?php echo $this->Form->control('sales_rate',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Sales Rate','required'=>'required']); ?>
-								</div>
-							</div>
-							<div class="col-md-4">
-								<div class="form-group">
-									<label>Max Purchase Qty </label>
-									<?php echo $this->Form->control('max_purchase_qty',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Max Purchase Qty','required'=>'required']); ?>
-								</div>
-							</div>
-							<div class="col-md-4">
-								<div class="form-group">
 									<label>Print Rate </label>
-									<?php echo $this->Form->control('print_rate',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Print Rate','required'=>'required']); ?>
+									<?php echo $this->Form->control('print_rate',['class'=>'rightAligntextClass form-control input-sm prints_rate','label'=>false,'placeholder'=>'Print Rate','required'=>'required']); ?>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Discount %</label>
+									<?php echo $this->Form->control('discount',['class'=>'rightAligntextClass form-control input-sm discount','label'=>false,'placeholder'=>'Discount %','required'=>'required']); ?>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label>Sales Rate </label>
+									<?php echo $this->Form->control('sales_rate',['class'=>'rightAligntextClass form-control input-sm sales_rate','label'=>false,'placeholder'=>'Sales Rate','readonly'=>'readonly']); ?>
 								</div>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-4">
 								<div class="form-group">
-									<label>Discount %</label>
-									<?php echo $this->Form->control('discount',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Sales Rate','required'=>'required']); ?>
+									<label>Max Purchase Qty </label>
+									<?php echo $this->Form->control('max_purchase_qty',['class'=>'rightAligntextClass form-control input-sm','label'=>false,'placeholder'=>'Max Purchase Qty','required'=>'required']); ?>
 								</div>
+								
 							</div>
 							<div class="col-md-4">
 								<div class="form-group">
@@ -222,29 +225,38 @@ $this->set('title', 'Create Item');
 						</div>
 					</div>
 				</div>
-				<div class="col-md-12 ">
 					<div class="row" >
-						<div class="form-group"><label><b>Add Multiple Image</b></label>
-							<table id="file_table" style="line-height:2.5">
-								<tr class="tr1">
-									<td>
-										<?php echo $this->Form->control('q',['class'=>'form-control input-sm select_file','label'=>false, 'type' =>'file']); ?>
-									</td>
-									<td>
-										<?php 
-										$option['Active']='Active';
-										$option['Deactive']='Deactive';
-										echo $this->Form->control('q',['class'=>'form-control input-sm select2me status','label'=>false,'empty'=>'-select-', 'options' => $option,'value'=>'Active']); ?>
-									</td>
-									<td>
-										<?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-plus']) . __(''), ['class'=>'btn btn-block btn-primary btn-sm add_more','type'=>'button']) ?>
-									</td>
-									<td></td>
-								</tr>
-							</table>
+						<div class="col-md-12">
+							<div class="form-group"><label><b>Add Multiple Image</b></label>
+								<table id="file_table" style="line-height:2.5">
+									<tr class="tr1">
+										<td>
+											<?php echo $this->Form->control('q',['class'=>'form-control input-sm select_file','label'=>false, 'type' =>'file']); ?>
+										</td>
+										<td>
+											<?php 
+											$option['Active']='Active';
+											$option['Deactive']='Deactive';
+											echo $this->Form->control('q',['class'=>'form-control input-sm select2me status','label'=>false,'empty'=>'-select-', 'options' => $option]); ?>
+										</td>
+										<td>
+											<?= $this->Form->button($this->Html->tag('i', '', ['class'=>'fa fa-plus']) . __(''), ['class'=>'btn btn-block btn-primary btn-sm add_more','type'=>'button']) ?>
+										</td>
+										<td></td>
+									</tr>
+								</table>
+							</div>	
 						</div>	
 					</div>
-				</div>
+				
+				<div class="row">
+							<div class="col-md-12">
+								<div class="form-group">
+									<label>Description </label>
+									<?php echo $this->Form->control('description',['class'=>'form-control input-sm','label'=>false,'rows'=>'2','id'=>'summernote_1']); ?>
+								</div>
+							</div>
+						</div>
 				<?= $this->Form->button(__('Submit'),['class'=>'btn btn-success']) ?>
 				<?= $this->Form->end() ?>
 			</div>
@@ -314,11 +326,43 @@ $this->set('title', 'Create Item');
 	<?php echo $this->Html->script('/assets/admin/layout/scripts/quick-sidebar.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
 	<?php echo $this->Html->script('/assets/admin/layout/scripts/demo.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
 	<?php echo $this->Html->script('/assets/admin/pages/scripts/components-dropdowns.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
+	<?php echo $this->Html->script('https://cdn.ckeditor.com/4.4.3/standard/ckeditor.js', ['block' => 'PAGE_LEVEL_SCRIPTS_JS']); ?>
 	<!-- END COMPONENTS DROPDOWNS -->
 <!-- END PAGE LEVEL SCRIPTS -->
 <?php
 	$js="
 	$(document).ready(function() {
+		CKEDITOR.replace('description');
+		
+	  $('.discount').die().live('keyup',function(){ 
+		var prints_rate = $('.prints_rate').val();
+		  var discount = $('.discount').val();
+		  
+		if(prints_rate){
+			 var dis = parseInt((prints_rate-discount));
+			$('.sales_rate').val(dis);
+		}else{
+			$('.sales_rate').val(0);
+		}  
+		 
+	  
+	  });
+	  
+	   $('.prints_rate').die().live('keyup',function(){ 
+		var prints_rate = $('.prints_rate').val();
+		  var discount = $('.discount').val();
+		  if(discount){
+			   var dis = parseInt((prints_rate-discount));
+			$('.sales_rate').val(dis);
+		  }else{
+			  $('.sales_rate').val(0);
+		  }
+		 
+	  
+	  });
+	 
+	  
+	  
 	  $('.calculation').die().live('keyup',function(){
 		  amt_calc();
 	  });
