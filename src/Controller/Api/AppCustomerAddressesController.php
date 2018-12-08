@@ -36,16 +36,16 @@ class AppCustomerAddressesController extends AppController
 				$appCustomerAddress->is_deleted =1;
 			//pr($appCustomerAddress);exit;
 			if ($this->AppCustomerAddresses->save($appCustomerAddress)) {
+				 $appcustomeraddresses = $this->AppCustomerAddresses->find()->contain(['Cities','States'])->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0]);
 				$success = true;
 				$message = "Data Deleted";
-				$appcustomeraddresses=[];
 			}else{
 				$success = false;
 				$message = "Data not Deleted";
 				$appcustomeraddresses=[];
 			}
 		  }else{
-			  $appcustomeraddresses = $this->AppCustomerAddresses->find()->contain(['Cities','States'])->where(['app_customer_id'=>$app_customer_id]);
+			  $appcustomeraddresses = $this->AppCustomerAddresses->find()->contain(['Cities','States'])->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0]);
 				if($appcustomeraddresses){
 					$success = true;
 					$message = 'data found';
