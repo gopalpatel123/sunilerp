@@ -21,7 +21,7 @@ class CartsController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['addtoCart','removeCart','cartList','addtoCartproduct']);
+        $this->Auth->allow(['addtoCart','removeCart','cartList','addtoCartproduct','cartreviewList']);
     }
 	
 	public function cartlistAdd($cart_id=null,$quantity=null){
@@ -72,7 +72,8 @@ class CartsController extends AppController
 			if($tag_name=='add'){ $this->cartlistAdd($Cart_id,$quantity); }
 			if($tag_name=='remove'){ $this->cartlistRemove($Cart_id); }
 			
-			$Cartdatas=$this->Carts->find()->where(['app_customer_id'=>$app_customer_id])->toArray();
+			$Cartdatas=$this->Carts->find()->where(['app_customer_id'=>$app_customer_id])
+			->contain(['Items'=>['AppBrands','Sizes','Shades']])->toArray();
 			if($Cartdatas){
 				$total_amount=0;
 				foreach($Cartdatas as $cartnew){
@@ -99,6 +100,53 @@ class CartsController extends AppController
 		
 		$this->set(compact(['success','message','Isaddress','total_amount','Carts']));
 		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts']);
+		
+	}
+	public function cartreviewList(){
+		$Carts=[];
+		$AppCustomerAddresses=[];
+		$app_customer_id=@$this->request->query['app_customer_id'];
+		$delivery_charge="Free";
+		if(!empty($app_customer_id)){
+			
+			$Addresscount=$this->Carts->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0])->count();
+			if($Addresscount>0){ 
+				$AppCustomerAddresses=$this->Carts->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0])
+				->contain(['Cities','States'])->first();
+				$Isaddress=true;
+			}else{
+				$Isaddress=false;
+
+			}
+			
+			
+			$Cartdatas=$this->Carts->find()->where(['app_customer_id'=>$app_customer_id])->contain(['Items'=>['AppBrands','Sizes','Shades']])->toArray();
+			if($Cartdatas){
+				$total_amount=0;
+				foreach($Cartdatas as $cartnew){
+					
+					$total_amount+=$cartnew->amount;
+				}
+				
+				
+				$Carts=$Cartdatas;
+				$success = true;
+				$message="Data found Successfully";
+			}else{
+				$success = false;
+				$message="Data not found";
+			}
+			
+			
+		}else{
+			
+			$success = false;
+		    $message="Empty customer id";
+			
+		}
+		
+		$this->set(compact(['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses']));
+		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses']);
 		
 	}
 	

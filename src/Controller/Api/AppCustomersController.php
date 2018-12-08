@@ -21,7 +21,7 @@ class AppCustomersController extends AppController
 	 public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['login','send_otp','sociallogin','signup','editProfile']);
+        $this->Auth->allow(['login','send_otp','sociallogin','signup','editProfile','verifymobile','forgetpassword']);
     }
 	
 	public function send_otp(){
@@ -55,6 +55,62 @@ class AppCustomersController extends AppController
 		}
 		$this->set(['success' => $success,'otp'=>$opt,'message'=>$message,'_serialize' => ['success','otp','message']]);
 
+	}
+	
+	public function forgetpassword(){
+		$mobile=@$this->request->query['mobile'];
+		$otp=@$this->request->query['otp'];
+		$password=@$this->request->query['password'];
+		if(!empty($mobile) and !empty($otp) and !empty($password)){
+			$exists_mobile = $this->AppCustomers->exists(['AppCustomers.mobile'=>$mobile,'AppCustomers.otp'=>$otp]);
+			if($exists_mobile==1){
+				$AppCustomers=$this->AppCustomers->find()->where(['AppCustomers.mobile'=>$mobile,'AppCustomers.otp'=>$otp])->first();
+				$AppCustomers->password=$password;
+				$this->AppCustomers->save($AppCustomers);
+				$success = true;
+				$message = 'Successfully set password';
+			}else{
+				$success = false;
+				$message = 'Mobile or otp is not exits';
+			}
+			
+		}else{
+			$success = false;
+		    $message = 'empty mobile no or otp or password';
+		}
+		$this->set(['success' => $success,'message'=>$message,'_serialize' => ['success','message']]);
+	}
+	
+	public function verifymobile(){
+		
+		$mobile=@$this->request->query['mobile'];
+		$otp=0;
+		if(!empty($mobile)){
+			$exists_mobile = $this->AppCustomers->exists(['AppCustomers.mobile'=>$mobile]);
+			if($exists_mobile==1){
+				$otp=(mt_rand(1111,9999));
+			    $AppCustomers=$this->AppCustomers->find()->where(['AppCustomers.mobile'=>$mobile])->first();
+				
+				$AppCustomers->otp=$otp;
+				$this->AppCustomers->save($AppCustomers);
+				$content="Your otp is ".$otp;
+				$this->Sms->sendSms($mobile,$content);
+				
+				$success = true;
+				$message = 'send otp successfully';
+				
+			}else{
+				$success = false;
+				$message = 'Mobile number is not exits';
+			}
+			
+		}else{
+			
+			$success = false;
+		    $message = 'empty mobile no';
+			
+		}
+		$this->set(['success' => $success,'otp'=>$otp,'message'=>$message,'_serialize' => ['success','otp','message']]);
 	}
 	
 	public function sociallogin(){
