@@ -232,15 +232,16 @@ class ItemsController extends AppController
 							
 							$keyname1 = 'ItemRows/'.$item->id.'/'.$item_item_images;
 							$this->AwsFile->putObjectFile($keyname1,$item_image_row['image_path']['tmp_name'],$item_image_row['image_path']['type']);
+							$query = $this->Items->ItemImageRows->query();
+							$query->insert(['item_id', 'image_path','status'])
+							->values([
+										'item_id' => $item->id,
+										'image_path' => $keyname1,
+										'status' => 'Active'
+										]);
+							$query->execute(); 	
 						}
-						$query = $this->Items->ItemImageRows->query();
-						$query->insert(['item_id', 'image_path','status'])
-						->values([
-									'item_id' => $item->id,
-									'image_path' => $keyname1,
-									'status' => 'Active'
-									]);
-						$query->execute(); 	
+						
 					}
 				}
 				
@@ -302,6 +303,7 @@ class ItemsController extends AppController
 
                 return $this->redirect(['action' => 'appAdd']);
             }
+			
             $this->Flash->error(__('The item could not be saved. Please, try again.'));
         }
         

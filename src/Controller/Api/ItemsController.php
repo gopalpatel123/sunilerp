@@ -51,7 +51,7 @@ class ItemsController extends AppController
 						$Brand[]=$Itemsforbrand->app_brand;
 					}
 				}
-				$filters[]=['Brand'=>$Brand];
+				$filters[]=['name'=>'Brand','filterlist'=>$Brand];
 				
 				//// End Code
 				
@@ -69,7 +69,7 @@ class ItemsController extends AppController
 						$size[]=$Itemsforsize->size;
 					}
 				}
-				$filters[]=['Size'=>$size];
+				$filters[]=['name'=>'Size','filterlist'=>$size];
 				
 				//End Size
 				
@@ -88,7 +88,7 @@ class ItemsController extends AppController
 						$shade[]=$Itemsforshade->shade;
 					}
 				}
-				$filters[]=['Shade'=>$shade];
+				$filters[]=['name'=>'Shade','filterlist'=>$shade];
 				
 				//End Shades
 				
@@ -98,7 +98,7 @@ class ItemsController extends AppController
 				$discounts[]=['id'=>20,'name'=>'20 Above'];
 				$discounts[]=['id'=>30,'name'=>'30 Above'];
 				
-				$filters[]=['Discount'=>$discounts];
+				$filters[]=['name'=>'Discount','filterlist'=>$discounts];
 				
 				
 				//End Discount 
@@ -110,7 +110,7 @@ class ItemsController extends AppController
 				$Prices[]=['id'=>5000,'name'=>'5000 Above'];
 				$Prices[]=['id'=>10000,'name'=>'10000 Above'];
 				
-				$filters[]=['Price'=>$Prices];
+				$filters[]=['name'=>'Price','filterlist'=>$Prices];
 				
 				
 				//End Price Range 
@@ -261,7 +261,7 @@ class ItemsController extends AppController
 		// Item details 
 		
 			$Items=$this->Items->find()->where(['Items.id'=>$item_id])
-			->contain(['AppBrands','Sizes','Shades','ItemImageRows'])
+			->contain(['AppBrands','Sizes','Shades','ItemImageRows','Companies'])
 			 ->leftJoinWith('AppBrands')->first()->toArray();
 			 
 			$inWishList=$this->Items->AppWishListItems->find()

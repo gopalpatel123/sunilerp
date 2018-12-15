@@ -15,7 +15,100 @@ use Cake\Validation\Validation;
  */
 class AppHomeScreensController extends AppController
 {
-
+	public function initialize()
+    {
+        parent::initialize();
+        $this->Auth->allow(['getHomeScreen','homescreen']);
+    }
+	
+	public function homescreensecond(){
+		
+		$stock_group_id=@$this->request->query['stock_group_id'];
+		$AppHomeScreens = $this->AppHomeScreens->find()
+		->contain(['StockGroups'=>['ChildStockGroups']])
+		->leftJoinWith('StockGroups')
+		->order(['preference'=>'ASC'])
+		->toArray();
+		
+	}
+	
+	public function homescreen(){
+		
+		$AppHomeScreens = $this->AppHomeScreens->find()
+		->contain(['StockGroups'=>['ChildStockGroups']])
+		->leftJoinWith('StockGroups')
+		->order(['preference'=>'ASC'])
+		->toArray();
+		//pr($AppHomeScreens);exit;
+		$dynamic=[];
+		foreach($AppHomeScreens as $apphome){
+			
+			if($apphome->layout == 'category'){
+				
+				$StockGroups=$this->AppHomeScreens->StockGroups->find()
+				->where(['is_status'=>'app','parent_id IS'=>null])
+				->order(['id'=>'DESC'])
+				->toArray();
+				
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$StockGroups];
+					array_push($dynamic,$AppHome);
+				}
+				
+				if($apphome->layout == 'Banner'){
+					$AppBanners=$this->AppHomeScreens->AppBanners->find()->order(['id'=>'DESC']);					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBanners];
+					array_push($dynamic,$AppHome);
+				}
+				
+				if($apphome->layout == 'single image'){
+								
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group];
+					array_push($dynamic,$AppHome);
+				}
+			
+				
+				if($apphome->layout == 'brand'){
+					$AppBrands=$this->AppHomeScreens->AppBrands->find()->order(['id'=>'DESC']);
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBrands];
+					array_push($dynamic,$AppHome);
+				}
+				
+				if($apphome->layout == 'multiple image'){
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
+					array_push($dynamic,$AppHome);
+				}
+				
+				if($apphome->layout == 'multiple image text'){
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
+					array_push($dynamic,$AppHome);
+				}
+				if($apphome->layout == 'multiple ITB'){
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
+					array_push($dynamic,$AppHome);
+				}
+				
+				if($apphome->layout == 'category item'){
+					$Items=$this->AppHomeScreens->StockGroups->Items->find()->where(['stock_group_id'=>$apphome->stock_group_id])->group('shade_id');
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$Items];
+					array_push($dynamic,$AppHome);
+				}
+			
+		}
+		//pr($AppHomeScreens);
+		//exit;
+		
+		$success = true;  
+		$message = 'Home Screen Data Found Successfully'; 
+		
+		$this->set(['success' => $success,'message'=>$message,'AppHomeScreens'=>$dynamic,'_serialize' => ['success','message','AppHomeScreens']]); 
+		
+	}
+	
     public function getHomeScreen(){
 		
 		$AppHomeScreens = $this->AppHomeScreens->find()->contain(['StockGroups']);

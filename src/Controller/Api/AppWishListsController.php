@@ -104,9 +104,11 @@ class AppWishListsController extends AppController
 				if(empty($Cartsdatas)){
 					 $Items=$this->AppWishLists->Carts->Items->get($item_id);
 					 $sales_rate=$Items->sales_rate;
+					 $company_id=$Items->company_id;
 					 $cart = $this->AppWishLists->Carts->newEntity();
 					 $cart->app_customer_id=$app_customer_id;
 					 $cart->item_id=$item_id;
+					 $cart->company_id=$company_id;
 					 $cart->quantity=1;
 					 $cart->rate=$sales_rate;
 					 $cart->amount=$sales_rate;

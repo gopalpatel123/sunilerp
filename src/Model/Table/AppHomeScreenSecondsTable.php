@@ -7,19 +7,20 @@ use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * AppHomeScreens Model
+ * AppHomeScreenSeconds Model
  *
  * @property \App\Model\Table\StockGroupsTable|\Cake\ORM\Association\BelongsTo $StockGroups
+ * @property \App\Model\Table\SubCategoriesTable|\Cake\ORM\Association\BelongsTo $SubCategories
  *
- * @method \App\Model\Entity\AppHomeScreen get($primaryKey, $options = [])
- * @method \App\Model\Entity\AppHomeScreen newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\AppHomeScreen[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\AppHomeScreen|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\AppHomeScreen patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\AppHomeScreen[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\AppHomeScreen findOrCreate($search, callable $callback = null, $options = [])
+ * @method \App\Model\Entity\AppHomeScreenSecond get($primaryKey, $options = [])
+ * @method \App\Model\Entity\AppHomeScreenSecond newEntity($data = null, array $options = [])
+ * @method \App\Model\Entity\AppHomeScreenSecond[] newEntities(array $data, array $options = [])
+ * @method \App\Model\Entity\AppHomeScreenSecond|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \App\Model\Entity\AppHomeScreenSecond patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \App\Model\Entity\AppHomeScreenSecond[] patchEntities($entities, array $data, array $options = [])
+ * @method \App\Model\Entity\AppHomeScreenSecond findOrCreate($search, callable $callback = null, $options = [])
  */
-class AppHomeScreensTable extends Table
+class AppHomeScreenSecondsTable extends Table
 {
 
     /**
@@ -32,7 +33,7 @@ class AppHomeScreensTable extends Table
     {
         parent::initialize($config);
 
-        $this->setTable('app_home_screens');
+        $this->setTable('app_home_screen_seconds');
         $this->setDisplayField('title');
         $this->setPrimaryKey('id');
 
@@ -40,9 +41,10 @@ class AppHomeScreensTable extends Table
             'foreignKey' => 'stock_group_id',
             'joinType' => 'INNER'
         ]);
-		$this->belongsTo('AppBrands');
-		$this->belongsTo('AppBanners');
-		$this->belongsTo('AppHomeScreenSeconds');
+        $this->belongsTo('SubCategories', [
+            'foreignKey' => 'sub_category_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
@@ -103,6 +105,7 @@ class AppHomeScreensTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['stock_group_id'], 'StockGroups'));
+        $rules->add($rules->existsIn(['sub_category_id'], 'SubCategories'));
 
         return $rules;
     }

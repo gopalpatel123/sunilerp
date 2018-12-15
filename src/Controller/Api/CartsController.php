@@ -50,7 +50,7 @@ class CartsController extends AppController
 	}
 	
 	public function cartList(){
-		$Carts=(object)[];
+		$Carts=[];
 		$app_customer_id=@$this->request->query['app_customer_id'];
 		$Cart_id=@$this->request->query['cart_id'];
 		$quantity=@$this->request->query['quantity'];
@@ -60,10 +60,7 @@ class CartsController extends AppController
 			
 			$Addresscount=$this->Carts->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0])->count();
 			if($Addresscount>0){ 
-					/* $AppCustomerAddresses=$this->Carts->AppCustomerAddresses->find()->where(['app_customer_id'=>$app_customer_id,'is_deleted'=>0])->first();
-					$city_id=$AppCustomerAddresses->city_id; 
-					$DeliveryCharges=$this->Carts->DeliveryCharges->find()->where(['DeliveryCharges.city_id'=>$city_id])->first();
-					pr($DeliveryCharges);exit; */
+					
 				$Isaddress=true;
 			}else{
 				$Isaddress=false;
@@ -74,10 +71,29 @@ class CartsController extends AppController
 			
 			$Cartdatas=$this->Carts->find()->where(['app_customer_id'=>$app_customer_id])
 			->contain(['Items'=>['AppBrands','Sizes','Shades']])->toArray();
+			
+				
+			
 			if($Cartdatas){
 				$total_amount=0;
-				foreach($Cartdatas as $cartnew){
-					
+				foreach($Cartdatas as $cartnew){ 
+					$total_quantity=0;
+					$query = $this->Carts->Items->ItemLedgers->find();
+					$query->select(['item_in'=>$query->func()->sum('quantity')])
+						->where(['status'=>'in','item_id'=>$cartnew->item_id,'company_id'=>$cartnew->item->company_id]);
+					$item_in = $query->first()->item_in;
+
+					$query = $this->Carts->Items->ItemLedgers->find();
+					$query->select(['item_out'=>$query->func()->sum('quantity')])
+						->where(['status'=>'out','item_id'=>$cartnew->item_id,'company_id'=>$cartnew->item->company_id]);
+					$item_out = $query->first()->item_out;
+
+					$total_quantity=$item_in-$item_out; 
+					if($cartnew->quantity >$total_quantity){
+						$cartnew->item->outofstock='Yes';
+					}else{
+						$cartnew->item->outofstock='No';
+					}
 					$total_amount+=$cartnew->amount;
 				}
 				
@@ -98,8 +114,8 @@ class CartsController extends AppController
 			
 		}
 		
-		$this->set(compact(['success','message','Isaddress','total_amount','Carts']));
-		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts']);
+		$this->set(compact(['success','message','Isaddress','total_amount','Carts','delivery_charge']));
+		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts','delivery_charge']);
 		
 	}
 	public function cartreviewList(){
@@ -145,8 +161,8 @@ class CartsController extends AppController
 			
 		}
 		
-		$this->set(compact(['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses']));
-		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses']);
+		$this->set(compact(['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses','delivery_charge']));
+		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses','delivery_charge']);
 		
 	}
 	
@@ -162,12 +178,14 @@ class CartsController extends AppController
 			$Items=$this->Carts->Items->find()->where(['Items.item_code'=>$item_code,'Items.shade_id'=>$shade_id,'Items.size_id'=>$size_id])->first()->toArray();
 			$item_id=$Items['id'];
 			$sales_rate=$Items['sales_rate'];
+			$company_id=$Items['company_id'];
 			$Cartsdatas=$this->Carts->find()->where(['Carts.app_customer_id'=>$app_customer_id,'Carts.item_id'=>$item_id])->toArray();
 			if(empty($Cartsdatas)){
 				
 				 $cart = $this->Carts->newEntity();
 				 $cart->app_customer_id=$app_customer_id;
 				 $cart->item_id=$item_id;
+				 $cart->company_id=$company_id;
 				 $cart->quantity=1;
 				 $cart->rate=$sales_rate;
 				 $cart->amount=$sales_rate;
@@ -202,12 +220,14 @@ class CartsController extends AppController
 				
 				$Items=$this->Carts->Items->get($item_id);
 				$sales_rate=$Items->sales_rate;
+				$company_id=$Items->company_id;
 				$Cartsdatas=$this->Carts->find()->where(['Carts.app_customer_id'=>$app_customer_id,'Carts.item_id'=>$item_id])->toArray();
 				if(empty($Cartsdatas)){
 					
 					 $cart = $this->Carts->newEntity();
 					 $cart->app_customer_id=$app_customer_id;
 					 $cart->item_id=$item_id;
+					 $cart->company_id=$company_id;
 					 $cart->quantity=1;
 					 $cart->rate=$sales_rate;
 					 $cart->amount=$sales_rate;
