@@ -308,9 +308,10 @@ class ItemsController extends AppController
         }
         
         $units = $this->Items->Units->find('list')->where(['company_id'=>$company_id]);
-        $stockGroups = $this->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']);
+        //$stockGroups = $this->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']);
+        $stockGroups = $this->Items->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app','ParentStockGroups.parent_id IS NULL']);
 		
-		$options=[];
+		/* $options=[];
 		$totSize=0;
 		foreach($stockGroups as $stockgroup){
 			$stockgroupsIds = $this->Items->StockGroups
@@ -321,7 +322,7 @@ class ItemsController extends AppController
 				$options[]=['text'=>$stockgroup->name,'value'=>$stockgroup->id];
 			}
 			
-		}
+		} */
 		//pr($options);exit;
         $shades = $this->Items->Shades->find('list')->where(['company_id'=>$company_id]);
         $brands = $this->Items->AppBrands->find('list')->where(['status'=>'Active']);
@@ -474,11 +475,15 @@ class ItemsController extends AppController
 			}
         }
         $units = $this->Items->Units->find('list')->where(['company_id'=>$company_id]);
-         $stockGroups = $this->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']);
+        /*  $stockGroups = $this->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']); */
 		
-		$options=[];
+		 $stockGroups = $this->Items->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app','ParentStockGroups.parent_id IS NULL']);
+		 
+		  $stockGroupss = $this->Items->StockGroups->ParentStockGroups->find()->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app','ParentStockGroups.parent_id IS NULL','id'=>$item->stock_group_id]);
+		
+		 $options=[];
 		$totSize=0;
-		foreach($stockGroups as $stockgroup){
+		foreach($stockGroupss as $stockgroup){
 			$stockgroupsIds = $this->Items->StockGroups
 							->find('children', ['for' => $stockgroup->id])
 							->find('all');
@@ -487,7 +492,8 @@ class ItemsController extends AppController
 				$options[]=['text'=>$stockgroup->name,'value'=>$stockgroup->id];
 			}
 			
-		}
+		} 
+		//pr($stockgroupsIds->toArray());exit;
 		 $brands = $this->Items->AppBrands->find('list')->where(['status'=>'Active']);
 		$shades = $this->Items->Shades->find('list')->where(['company_id'=>$company_id]);
         $sizes = $this->Items->Sizes->find('list')->where(['company_id'=>$company_id]);

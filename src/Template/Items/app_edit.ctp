@@ -27,13 +27,13 @@ $this->set('title', 'Edit Item');
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>Stock Group </label>
-									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Primary-', 'options' => $options]); ?>
+									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group_id','label'=>false,'empty'=>'-Primary-', 'options' => $stockGroups]); ?>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>HSN Code </label>
-									<?php echo $this->Form->control('hsn_code',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'HSN Code']); ?>
+									<label>Sub-Category</label>
+									 <?php echo $this->requestAction('/StockGroups/editStockSubGroup?stock_group_id='.$item->stock_group_id.'&sub_category_id='.$item->sub_category_id); ?>
 								</div>
 							</div>
 						</div>
@@ -75,13 +75,20 @@ $this->set('title', 'Edit Item');
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
+									<label>HSN Code </label>
+									<?php echo $this->Form->control('hsn_code',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'HSN Code']); ?>
+								</div>
+							</div>
+							
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
 									<label>Image</label>
 									<?php echo $this->Form->control('image_url',['class'=>'form-control input-sm image','label'=>false, 'type' =>'file','id'=>'image_url']); ?>
 								</div>
 							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
+							<div class="col-md-6">
 								<div class="form-group">
 								<?php 
 								
@@ -353,6 +360,21 @@ $this->set('title', 'Edit Item');
 	$(document).ready(function() {
 		CKEDITOR.replace('description');
 		
+	$('.stock_group_id').change(function(){
+		 $('#sub_category_id').html('<i style= margin-top: 32px;margin-left: 65px; class=fa fa-refresh fa-spin fa-1x fa-fw></i><b> Loading... </b>');
+		var stock_group_id = $(this).val();
+		var url='".$this->Url->build(['controller'=>'StockGroups','action'=>'stockSubGroup'])."';
+					url=url+'/'+stock_group_id;
+					$.ajax({ 
+						url:url,
+						type:'GET',
+						}).done(function(response){  
+						$('#sub_category_id').html(response);
+						$('select[name=sub_category_id]').select2();
+					}); 
+		
+		
+	});	
 		
 		
 	  $('.discount').die().live('keyup',function(){ 
