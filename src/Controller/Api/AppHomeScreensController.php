@@ -18,21 +18,21 @@ class AppHomeScreensController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['getHomeScreen','homescreen']);
+        $this->Auth->allow(['getHomeScreen','homescreen','homescreensecond']);
     }
 	
 	public function homescreensecond(){
 		
-			$AppHomeScreens = $this->AppHomeScreens->find()
+			$AppHomeScreens = $this->AppHomeScreens->AppHomeScreenSeconds->find()
 		->contain(['StockGroups'=>['ChildStockGroups']])
 		->leftJoinWith('StockGroups')
 		->order(['preference'=>'ASC'])
 		->toArray();
-		//pr($AppHomeScreens);exit;
+		pr($AppHomeScreens);exit;
 		$dynamic=[];
 		foreach($AppHomeScreens as $apphome){
 			
-			if($apphome->layout == 'category'){
+			/* if($apphome->layout == 'category'){
 				
 				$StockGroups=$this->AppHomeScreens->StockGroups->find()
 				->where(['is_status'=>'app','parent_id IS'=>null])
@@ -41,22 +41,28 @@ class AppHomeScreensController extends AppController
 				
 					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$StockGroups];
 					array_push($dynamic,$AppHome);
-				}
+				} */
 				
-				if($apphome->layout == 'Banner'){
+				/* if($apphome->layout == 'Banner'){
 					$AppBanners=$this->AppHomeScreens->AppBanners->find()->order(['id'=>'DESC']);					
 					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBanners];
 					array_push($dynamic,$AppHome);
-				}
+				} */
 				
 				if($apphome->layout == 'single image'){
 								
 					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group];
 					array_push($dynamic,$AppHome);
 				}
+				
+				if($apphome->layout == 'shop category'){
+								
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group];
+					array_push($dynamic,$AppHome);
+				}
 			
 				
-				if($apphome->layout == 'brand'){
+				if($apphome->layout == 'horizontal'){
 					$AppBrands=$this->AppHomeScreens->AppBrands->find()->order(['id'=>'DESC']);
 					
 					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBrands];
