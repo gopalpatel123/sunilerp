@@ -17,6 +17,7 @@ use Cake\ORM\Entity;
  * @property string $model_name
  * @property string $image
  * @property string $link_name
+ * @property string $sub_title
  *
  * @property \App\Model\Entity\StockGroup $stock_group
  * @property \App\Model\Entity\SubCategory $sub_category

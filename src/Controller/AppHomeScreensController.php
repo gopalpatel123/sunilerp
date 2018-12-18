@@ -66,10 +66,45 @@ class AppHomeScreensController extends AppController
         $appHomeScreen = $this->AppHomeScreens->newEntity();
 		$company_id=$this->Auth->User('session_company_id');
         if ($this->request->is('post')) {
+			
             $appHomeScreen = $this->AppHomeScreens->patchEntity($appHomeScreen, $this->request->getData());
+			$link_names=$this->request->getData('link_name');
+			$names=$this->request->getData('name');
+			$stock_groups=$this->request->getData('stock_group_name');
+			$multiple_images=$this->request->getData('multiple_image');
 			$image=$this->request->getData('image');
-			//pr($appHomeScreen);exit;
+			
             if ($this->AppHomeScreens->save($appHomeScreen)) {
+				
+				$i=0;
+				   if(!empty($multiple_images[0]['name'])){
+					   foreach($multiple_images as $dataimage){
+							$AppHomeScreenRows = $this->AppHomeScreens->AppHomeScreenRows->newEntity();
+							$name=$names[$i];
+							$link_name=$link_names[$i];
+							$stock_group=$stock_groups[$i];
+							$multiple_image=$multiple_images[$i];
+							
+							$item_error=$multiple_image['error'];
+							if(empty($item_error))
+							{
+								$item_ext=explode('/',$multiple_image['type']);
+								$item_item_image='homescreen'.rand().'.'.$item_ext[1];
+							}
+
+							$keyname = 'Homescreen/'.$appHomeScreen->id.'/'.$item_item_image;
+							$this->AwsFile->putObjectFile($keyname,$multiple_image['tmp_name'],$multiple_image['type']);
+
+							$AppHomeScreenRows->name=$name;
+							$AppHomeScreenRows->link_name=$link_name;
+							$AppHomeScreenRows->stock_group_id=$stock_group;
+							$AppHomeScreenRows->app_home_screen_id=$appHomeScreen->id;
+							$AppHomeScreenRows->image=$keyname;
+							$this->AppHomeScreens->AppHomeScreenRows->save($AppHomeScreenRows);
+						
+						$i++;	
+					   }
+					}
 				
 				if(!empty($image['tmp_name'])){
 						$item_error=$image['error'];
@@ -90,10 +125,11 @@ class AppHomeScreensController extends AppController
 					->where(['id' => $appHomeScreen->id])
 					->execute();
 				}
+				
                 $this->Flash->success(__('The app home screen has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
-            }
+            } 
             $this->Flash->error(__('The app home screen could not be saved. Please, try again.'));
         }
 		 $parentStockGroups = $this->AppHomeScreens->StockGroups->ParentStockGroups->find('list')->where(['company_id'=>$company_id,'ParentStockGroups.is_status'=>'app']);

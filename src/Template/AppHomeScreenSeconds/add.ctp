@@ -11,7 +11,7 @@ $this->set('title', 'Create App Home Screen');
 			<div class="portlet-title">
 				<div class="caption">
 					<i class="icon-bar-chart font-green-sharp hide"></i>
-					<span class="caption-subject font-green-sharp bold ">Create App Home Screen</span>
+					<span class="caption-subject font-green-sharp bold ">Create App Home Screen Second</span>
 				</div>
 			</div>
 			<div class="portlet-body">
@@ -36,8 +36,8 @@ $this->set('title', 'Create App Home Screen');
 									<label>Layout</label>
 									<?php 
 									$layout=[];
-									$layout=[['text'=>'Banner','value'=>'banner'],['text'=>'Brand','value'=>'brand'],['text'=>'Square','value'=>'Square'],['text'=>'Landscape','value'=>'Landscape'],['text'=>'Big','value'=>'Big'],['text'=>'Multiple Image','value'=>'Multiple Image'],['text'=>'Multiple Image with Title','value'=>'Multiple Image with Title'],['text'=>'Multiple Image with Text','value'=>'Multiple Image with Text'],['text'=>'Multiple Image with Text Title','value'=>'Multiple Image with Text Title'],['text'=>'Multiple Image with Text Title Background','value'=>'Multiple Image with Text Title Background'],['text'=>'Multiple Image with Text Title Background Square','value'=>'Multiple Image with Text Title Background Square'],
-									['text'=>'Category','value'=>'category']];
+									$layout=[['text'=>'Landscape','value'=>'Landscape'],['text'=>'Category','value'=>'category'],['text'=>'Landscape Full','value'=>'Landscape Full'],['text'=>'Multiple Image with Text Title','value'=>'Multiple Image with Text Title'],['text'=>'Multiple Image with Title','value'=>'Multiple Image with Title'],['text'=>'Multiple Image with Text Title Background','value'=>'Multiple Image with Text Title Background'],['text'=>'Multiple Image with Text Title Square','value'=>'Multiple Image with Text Title Square'],['text'=>'Brand','value'=>'brand'],['text'=>'Multiple Image with Text Title Small','value'=>'Multiple Image with Text Title Small'],['text'=>'Multiple Image Big','value'=>'Multiple Image Big'],['text'=>'Multiple Join Image','value'=>'Multiple Join Image']
+									];
 									
 									echo $this->Form->control('layout',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Layout-', 'options' => $layout]); ?>
 								</div>
@@ -45,18 +45,22 @@ $this->set('title', 'Create App Home Screen');
 						</div>
 						
 						<div class="row">
-							
-							<div class="col-md-4">
+							<div class="col-md-3">
+								<div class="form-group">
+									<label>Main Category Add</label>
+									<?php echo $this->Form->control('sub_category_id',['class'=>'form-control input-sm select2me','label'=>false,'options' => $stockGroups]); ?>
+								</div>
+							</div>
+							<div class="col-md-3">
 								<div class="form-group">
 									<label>Link URL </label>
 									<?php echo $this->Form->control('link_name1',['class'=>'form-control input-sm','placeholder'=>'Link URL','label'=>false,'autofocus']); ?>
 								</div>
 							</div>
-							<div class="col-md-4">
+							<div class="col-md-3">
 								<div class="form-group">
 									<label>Preference</label>
 									<?php 
-									
 									$preference=[];
 									for($i=1;$i<101;$i++){
 										$preference[$i]=$i;
@@ -66,7 +70,7 @@ $this->set('title', 'Create App Home Screen');
 									echo $this->Form->control('preference',['class'=>'form-control input-sm select2me','label'=>false,'empty'=>'-Preference-', 'options' => $preference]); ?>
 								</div>
 							</div>
-							<div class="col-md-4">
+							<div class="col-md-3">
 								<div class="form-group">
 									<label>Category</label>
 									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group_id','label'=>false,'empty'=>'-Category Group-', 'options' => $parentStockGroups]); ?>
