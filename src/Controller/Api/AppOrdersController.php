@@ -196,8 +196,11 @@ class AppOrdersController extends AppController
 								->set(['total_gst'=>$total_gst,'grand_total'=>$total_amount,'round_off'=>$round_off])
 								->where(['id'=>$appOrder->id])->execute();	
 								
-								
-								
+							foreach($Cartsdatas as $cartdata){
+									$cart_id=$cartdata->id;
+									$Cartsdetete=$this->AppOrders->Carts->get($cart_id);
+									$this->AppOrders->Carts->delete($Cartsdetete);
+								}
 								
 						}
 					

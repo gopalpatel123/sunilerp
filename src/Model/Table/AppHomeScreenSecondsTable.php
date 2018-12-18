@@ -45,6 +45,8 @@ class AppHomeScreenSecondsTable extends Table
             'foreignKey' => 'sub_category_id',
             'joinType' => 'INNER'
         ]);
+		
+		 $this->belongsTo('StockGroups',
     }
 
     /**
