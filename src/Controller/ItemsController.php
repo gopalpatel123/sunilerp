@@ -216,8 +216,13 @@ class ItemsController extends AppController
 				$data_to_encode = strtoupper($item->provided_item_code);
 			}
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
+			$sub_category_id = $item->sub_category_id;
+			$stock_group_id = $item->stock_group_id;
+			$item->stock_group_id = $sub_category_id;
+			$item->sub_category_id = $stock_group_id;
           // pr($this->request->getData('item_image_rows'));exit;
 		 // pr($this->request->getData('item_image_rows'));exit;
+		 //pr($item);exit;
 			if ($this->Items->save($item))
 			{
 				if(!empty($this->request->getData('item_image_rows'))){
@@ -533,6 +538,10 @@ class ItemsController extends AppController
 				$item->gst_amount           = 0;
 			}
 			$item->sales_rate_update_on = $this->Auth->User('session_company')->books_beginning_from;
+			$sub_category_id = $item->sub_category_id;
+			$stock_group_id = $item->stock_group_id;
+			$item->stock_group_id = $sub_category_id;
+			$item->sub_category_id = $stock_group_id;
 			if ($this->Items->save($item)) {
 				if($item->quantity>0)
 				{
