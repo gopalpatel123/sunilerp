@@ -27,15 +27,21 @@ $this->set('title', 'Edit Item');
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>Stock Group </label>
-									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group_id','label'=>false,'empty'=>'-Primary-', 'options' => $stockGroups]); ?>
+									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group_id','label'=>false,'empty'=>'-Primary-', 'options' => $options]); ?>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
+									<label>HSN Code </label>
+									<?php echo $this->Form->control('hsn_code',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'HSN Code']); ?>
+								</div>
+							</div>
+							<!--<div class="col-md-6">
+								<div class="form-group">
 									<label>Sub-Category</label>
 									 <?php echo $this->requestAction('/StockGroups/editStockSubGroup?stock_group_id='.$item->stock_group_id.'&sub_category_id='.$item->sub_category_id); ?>
 								</div>
-							</div>
+							</div>-->
 						</div>
 						<div class="row">
 							<div class="col-md-6">
@@ -75,20 +81,15 @@ $this->set('title', 'Edit Item');
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>HSN Code </label>
-									<?php echo $this->Form->control('hsn_code',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'HSN Code']); ?>
+									<label>Image</label>
+									<?php echo $this->Form->control('image_url',['class'=>'form-control input-sm image','label'=>false, 'type' =>'file','id'=>'image_url']); ?>
 								</div>
 							</div>
 							
 						</div>
 						<div class="row">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label>Image</label>
-									<?php echo $this->Form->control('image_url',['class'=>'form-control input-sm image','label'=>false, 'type' =>'file','id'=>'image_url']); ?>
-								</div>
-							</div>
-							<div class="col-md-6">
+							
+							<div class="col-md-12">
 								<div class="form-group">
 								<?php 
 								

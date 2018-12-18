@@ -26,15 +26,21 @@ $this->set('title', 'Create Item');
 							<div class="col-md-6">
 								<div class="form-group">
 									<label>Under Stock Group </label>
-									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group_id','label'=>false,'empty'=>'-Primary-', 'options' => $stockGroups]); ?>
+									<?php echo $this->Form->control('stock_group_id',['class'=>'form-control input-sm select2me stock_group_id','label'=>false,'empty'=>'-Primary-', 'options' => $options]); ?>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
+									<label>HSN Code</label>
+									<?php echo $this->Form->control('hsn_code',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'HSN Code']); ?>
+								</div>
+							</div>
+							<!--<div class="col-md-6">
+								<div class="form-group">
 									<label>Sub-Category</label>
 									<?php echo $this->Form->control('sub_category_id',['class'=>'form-control input-sm select2me sub_category_id','label'=>false,'empty'=>'-Sub-Category Group-', 'options' => '','id'=>'sub_category_id']); ?>
 								</div>
-							</div>
+							</div>-->
 						</div>
 						<div class="row">
 							<div class="col-md-6">
@@ -74,19 +80,14 @@ $this->set('title', 'Create Item');
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
-									<label>HSN Code</label>
-									<?php echo $this->Form->control('hsn_code',['class'=>'form-control input-sm','label'=>false,'placeholder'=>'HSN Code']); ?>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-								<div class="form-group">
 									<label>Image</label>
 									<?php echo $this->Form->control('image_url',['class'=>'form-control input-sm image','label'=>false, 'type' =>'file','id'=>'image_url']); ?>
 								</div>
 							</div>
-							<div class="col-md-6">
+						</div>
+						<div class="row">
+							
+							<div class="col-md-12">
 								<div class="form-group">
 								<?= $this->Html->image('/img/download.png',['class'=>'img-responsive thumbnail','style'=>'height: 98px;','id'=>'imgshw1'])?>
 										
