@@ -4,27 +4,19 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * AppHomeScreen Entity
+ * AppHomeScreenSecondRow Entity
  *
  * @property int $id
- * @property string $title
- * @property string $layout
- * @property string $section_show
- * @property int $preference
+ * @property string $name
+ * @property int $app_home_screen_second_id
  * @property int $stock_group_id
- * @property int $sub_category_id
- * @property string $screen_type
- * @property string $model_name
  * @property string $image
  * @property string $link_name
- * @property string $sub_title
  *
- * @property \App\Model\Entity\StockGroup $stock_group
- * @property \App\Model\Entity\AppBrand $app_brand
- * @property \App\Model\Entity\AppBanner $app_banner
  * @property \App\Model\Entity\AppHomeScreenSecond $app_home_screen_second
+ * @property \App\Model\Entity\StockGroup $stock_group
  */
-class AppHomeScreen extends Entity
+class AppHomeScreenSecondRow extends Entity
 {
 
     /**

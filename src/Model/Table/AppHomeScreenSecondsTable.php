@@ -11,6 +11,7 @@ use Cake\Validation\Validator;
  *
  * @property \App\Model\Table\StockGroupsTable|\Cake\ORM\Association\BelongsTo $StockGroups
  * @property \App\Model\Table\SubCategoriesTable|\Cake\ORM\Association\BelongsTo $SubCategories
+ * @property |\Cake\ORM\Association\HasMany $AppHomeScreenSecondRows
  *
  * @method \App\Model\Entity\AppHomeScreenSecond get($primaryKey, $options = [])
  * @method \App\Model\Entity\AppHomeScreenSecond newEntity($data = null, array $options = [])
@@ -41,12 +42,13 @@ class AppHomeScreenSecondsTable extends Table
             'foreignKey' => 'stock_group_id',
             'joinType' => 'INNER'
         ]);
-        $this->belongsTo('SubCategories', [
+       /*  $this->belongsTo('SubCategories', [
             'foreignKey' => 'sub_category_id',
             'joinType' => 'INNER'
+        ]); */
+        $this->hasMany('AppHomeScreenSecondRows', [
+            'foreignKey' => 'app_home_screen_second_id'
         ]);
-		
-		 $this->belongsTo('StockGroups',
     }
 
     /**
@@ -65,7 +67,7 @@ class AppHomeScreenSecondsTable extends Table
             ->requirePresence('title', 'create')
             ->notEmpty('title');
 
-        $validator
+       /*  $validator
             ->requirePresence('layout', 'create')
             ->notEmpty('layout');
 
@@ -94,6 +96,10 @@ class AppHomeScreenSecondsTable extends Table
             ->requirePresence('link_name', 'create')
             ->notEmpty('link_name');
 
+        $validator
+            ->requirePresence('sub_title', 'create')
+            ->notEmpty('sub_title'); */
+
         return $validator;
     }
 
@@ -107,7 +113,7 @@ class AppHomeScreenSecondsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['stock_group_id'], 'StockGroups'));
-        $rules->add($rules->existsIn(['sub_category_id'], 'SubCategories'));
+        //$rules->add($rules->existsIn(['sub_category_id'], 'SubCategories'));
 
         return $rules;
     }

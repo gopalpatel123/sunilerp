@@ -1,22 +1,22 @@
 <?php
 namespace App\Test\TestCase\Model\Table;
 
-use App\Model\Table\AppHomeScreensTable;
+use App\Model\Table\AppHomeScreenRowsTable;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 
 /**
- * App\Model\Table\AppHomeScreensTable Test Case
+ * App\Model\Table\AppHomeScreenRowsTable Test Case
  */
-class AppHomeScreensTableTest extends TestCase
+class AppHomeScreenRowsTableTest extends TestCase
 {
 
     /**
      * Test subject
      *
-     * @var \App\Model\Table\AppHomeScreensTable
+     * @var \App\Model\Table\AppHomeScreenRowsTable
      */
-    public $AppHomeScreens;
+    public $AppHomeScreenRows;
 
     /**
      * Fixtures
@@ -24,6 +24,7 @@ class AppHomeScreensTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
+        'app.app_home_screen_rows',
         'app.app_home_screens',
         'app.stock_groups',
         'app.companies',
@@ -116,8 +117,6 @@ class AppHomeScreensTableTest extends TestCase
         'app.grn_rows',
         'app.second_tamp_grn_records',
         'app.first_tamp_grn_records',
-        'app.app_banners',
-        'app.app_home_screen_seconds',
         'app.sub_categories'
     ];
 
@@ -129,8 +128,8 @@ class AppHomeScreensTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $config = TableRegistry::exists('AppHomeScreens') ? [] : ['className' => AppHomeScreensTable::class];
-        $this->AppHomeScreens = TableRegistry::get('AppHomeScreens', $config);
+        $config = TableRegistry::exists('AppHomeScreenRows') ? [] : ['className' => AppHomeScreenRowsTable::class];
+        $this->AppHomeScreenRows = TableRegistry::get('AppHomeScreenRows', $config);
     }
 
     /**
@@ -140,7 +139,7 @@ class AppHomeScreensTableTest extends TestCase
      */
     public function tearDown()
     {
-        unset($this->AppHomeScreens);
+        unset($this->AppHomeScreenRows);
 
         parent::tearDown();
     }

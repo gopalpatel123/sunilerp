@@ -22,83 +22,98 @@ class AppHomeScreensController extends AppController
     }
 	
 	public function homescreensecond(){
-		
-			$AppHomeScreens = $this->AppHomeScreens->AppHomeScreenSeconds->find()
-		->contain(['StockGroups'=>['ChildStockGroups']])
-		->leftJoinWith('StockGroups')
-		->order(['preference'=>'ASC'])
-		->toArray();
-		pr($AppHomeScreens);exit;
-		$dynamic=[];
-		foreach($AppHomeScreens as $apphome){
-			
-			/* if($apphome->layout == 'category'){
-				
-				$StockGroups=$this->AppHomeScreens->StockGroups->find()
-				->where(['is_status'=>'app','parent_id IS'=>null])
-				->order(['id'=>'DESC'])
+		$stock_group_id=@$this->request->query['stock_group_id'];
+			if(!empty($stock_group_id)){
+				$AppHomeScreens = $this->AppHomeScreens->AppHomeScreenSeconds->find()
+				->contain(['AppHomeScreenSecondRows'])
+				->where(['section_show'=>'Yes','sub_category_id'=>$stock_group_id])
+				->order(['preference'=>'ASC'])
 				->toArray();
 				
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$StockGroups];
-					array_push($dynamic,$AppHome);
-				} */
-				
-				/* if($apphome->layout == 'Banner'){
-					$AppBanners=$this->AppHomeScreens->AppBanners->find()->order(['id'=>'DESC']);					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBanners];
-					array_push($dynamic,$AppHome);
-				} */
-				
-				if($apphome->layout == 'single image'){
+				$dynamic=[];
+					if($AppHomeScreens){
+						foreach($AppHomeScreens as $apphome){
+							
+								if($apphome->layout == 'Landscape'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
 								
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group];
-					array_push($dynamic,$AppHome);
-				}
-				
-				if($apphome->layout == 'shop category'){
+								if($apphome->layout == 'Landscape Full'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
 								
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group];
-					array_push($dynamic,$AppHome);
+								if($apphome->layout == 'category'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+								
+								if($apphome->layout == 'Multiple Image with Text Title'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+							
+								if($apphome->layout == 'Multiple Image with Title'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+							
+								if($apphome->layout == 'Multiple Image with Text Title Background'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+								
+								if($apphome->layout == 'Multiple Image with Text Title Square'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+								
+								if($apphome->layout == 'Multiple Image with Text Title Small'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+								
+								if($apphome->layout == 'Multiple Image Big'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+								
+								if($apphome->layout == 'Multiple Join Image'){
+												
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+									array_push($dynamic,$AppHome);
+								}
+							
+								if($apphome->layout == 'brand'){
+									$AppBrands=$this->AppHomeScreens->AppBrands->find()->order(['id'=>'DESC']);
+							
+									$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBrands];
+									array_push($dynamic,$AppHome);
+								}
+							
+							
+						}
+					  $success = true;  
+					  $message = 'Home Screen Data Found Successfully'; 
+				}else{
+					$success = false;  
+					$message = 'Data Not Found'; 
 				}
-			
+			}else{
+				$success = false;  
+				$message = 'empty category_id'; 
 				
-				if($apphome->layout == 'horizontal'){
-					$AppBrands=$this->AppHomeScreens->AppBrands->find()->order(['id'=>'DESC']);
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBrands];
-					array_push($dynamic,$AppHome);
-				}
-				
-				if($apphome->layout == 'multiple image'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
-					array_push($dynamic,$AppHome);
-				}
-				
-				if($apphome->layout == 'multiple image text'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
-					array_push($dynamic,$AppHome);
-				}
-				if($apphome->layout == 'multiple ITB'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
-					array_push($dynamic,$AppHome);
-				}
-				
-				if($apphome->layout == 'category item'){
-					$Items=$this->AppHomeScreens->StockGroups->Items->find()->where(['stock_group_id'=>$apphome->stock_group_id])->group('shade_id');
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$Items];
-					array_push($dynamic,$AppHome);
-				}
-			
-		}
-		//pr($AppHomeScreens);
-		//exit;
-		
-		$success = true;  
-		$message = 'Home Screen Data Found Successfully'; 
+			}
 		
 		$this->set(['success' => $success,'message'=>$message,'AppHomeScreens'=>$dynamic,'_serialize' => ['success','message','AppHomeScreens']]); 
 	}
@@ -106,12 +121,12 @@ class AppHomeScreensController extends AppController
 	public function homescreen(){
 		
 		$AppHomeScreens = $this->AppHomeScreens->find()
-		->contain(['StockGroups'=>['ChildStockGroups']])
-		->leftJoinWith('StockGroups')
+		->contain(['AppHomeScreenRows'])
+		->where(['section_show'=>'Yes'])
 		->order(['preference'=>'ASC'])
 		->toArray();
-		//pr($AppHomeScreens);exit;
-		$dynamic=[];
+		
+		 $dynamic=[];
 		foreach($AppHomeScreens as $apphome){
 			
 			if($apphome->layout == 'category'){
@@ -125,15 +140,15 @@ class AppHomeScreensController extends AppController
 					array_push($dynamic,$AppHome);
 				}
 				
-				if($apphome->layout == 'Banner'){
+				if($apphome->layout == 'banner'){
 					$AppBanners=$this->AppHomeScreens->AppBanners->find()->order(['id'=>'DESC']);					
 					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$AppBanners];
 					array_push($dynamic,$AppHome);
 				}
 				
-				if($apphome->layout == 'single image'){
+				if($apphome->layout == 'Big'){
 								
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group];
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
 					array_push($dynamic,$AppHome);
 				}
 			
@@ -145,33 +160,54 @@ class AppHomeScreensController extends AppController
 					array_push($dynamic,$AppHome);
 				}
 				
-				if($apphome->layout == 'multiple image'){
+				
+				if($apphome->layout == 'Landscape'){
 					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
 					array_push($dynamic,$AppHome);
 				}
 				
-				if($apphome->layout == 'multiple image text'){
+				if($apphome->layout == 'Square'){
 					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
 					array_push($dynamic,$AppHome);
 				}
-				if($apphome->layout == 'multiple ITB'){
+				if($apphome->layout == 'Multiple Image with Title'){
+				
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
 					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome->stock_group->child_stock_groups];
 					array_push($dynamic,$AppHome);
 				}
 				
-				if($apphome->layout == 'category item'){
-					$Items=$this->AppHomeScreens->StockGroups->Items->find()->where(['stock_group_id'=>$apphome->stock_group_id])->group('shade_id');
+				if($apphome->layout == 'Multiple Image with Text'){
 					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$Items];
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					array_push($dynamic,$AppHome);
+				}
+				if($apphome->layout == 'Multiple Image'){
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					array_push($dynamic,$AppHome);
+				}
+			   if($apphome->layout == 'Multiple Image with Text Title Background'){
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					array_push($dynamic,$AppHome);
+				} 
+				
+				if($apphome->layout == 'Multiple Image with Text Title Background Square'){
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					array_push($dynamic,$AppHome);
+				}
+				
+			   if($apphome->layout == 'Multiple Image with Text Title'){
+					
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
 					array_push($dynamic,$AppHome);
 				}
 			
-		}
-		//pr($AppHomeScreens);
-		//exit;
+		} 
 		
 		$success = true;  
 		$message = 'Home Screen Data Found Successfully'; 
@@ -180,7 +216,7 @@ class AppHomeScreensController extends AppController
 		
 	}
 	
-    public function getHomeScreen(){
+   /*  public function getHomeScreen(){
 		
 		$AppHomeScreens = $this->AppHomeScreens->find()->contain(['StockGroups']);
 		
@@ -252,5 +288,5 @@ class AppHomeScreensController extends AppController
     	}
     	
     	$this->set(['success' => $success,'message'=>$message,'AppHomeScreens'=>$AppHome,'_serialize' => ['success','message','AppHomeScreens']]); 
-	}
+	} */
 }

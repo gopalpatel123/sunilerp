@@ -28,6 +28,7 @@ class AppHomeScreenSecondsFixture extends TestFixture
         'model_name' => ['type' => 'string', 'length' => 30, 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'image' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         'link_name' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
+        'sub_title' => ['type' => 'string', 'length' => 255, 'null' => false, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null, 'fixed' => null],
         '_constraints' => [
             'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
         ],
@@ -55,7 +56,8 @@ class AppHomeScreenSecondsFixture extends TestFixture
             'screen_type' => 'Lorem ipsum d',
             'model_name' => 'Lorem ipsum dolor sit amet',
             'image' => 'Lorem ipsum dolor sit amet',
-            'link_name' => 'Lorem ipsum dolor sit amet'
+            'link_name' => 'Lorem ipsum dolor sit amet',
+            'sub_title' => 'Lorem ipsum dolor sit amet'
         ],
     ];
 }

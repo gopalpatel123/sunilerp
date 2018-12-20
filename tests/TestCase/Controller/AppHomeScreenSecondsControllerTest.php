@@ -1,22 +1,14 @@
 <?php
-namespace App\Test\TestCase\Model\Table;
+namespace App\Test\TestCase\Controller;
 
-use App\Model\Table\AppHomeScreensTable;
-use Cake\ORM\TableRegistry;
-use Cake\TestSuite\TestCase;
+use App\Controller\AppHomeScreenSecondsController;
+use Cake\TestSuite\IntegrationTestCase;
 
 /**
- * App\Model\Table\AppHomeScreensTable Test Case
+ * App\Controller\AppHomeScreenSecondsController Test Case
  */
-class AppHomeScreensTableTest extends TestCase
+class AppHomeScreenSecondsControllerTest extends IntegrationTestCase
 {
-
-    /**
-     * Test subject
-     *
-     * @var \App\Model\Table\AppHomeScreensTable
-     */
-    public $AppHomeScreens;
 
     /**
      * Fixtures
@@ -24,7 +16,7 @@ class AppHomeScreensTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'app.app_home_screens',
+        'app.app_home_screen_seconds',
         'app.stock_groups',
         'app.companies',
         'app.states',
@@ -116,61 +108,55 @@ class AppHomeScreensTableTest extends TestCase
         'app.grn_rows',
         'app.second_tamp_grn_records',
         'app.first_tamp_grn_records',
-        'app.app_banners',
-        'app.app_home_screen_seconds',
         'app.sub_categories'
     ];
 
     /**
-     * setUp method
+     * Test index method
      *
      * @return void
      */
-    public function setUp()
-    {
-        parent::setUp();
-        $config = TableRegistry::exists('AppHomeScreens') ? [] : ['className' => AppHomeScreensTable::class];
-        $this->AppHomeScreens = TableRegistry::get('AppHomeScreens', $config);
-    }
-
-    /**
-     * tearDown method
-     *
-     * @return void
-     */
-    public function tearDown()
-    {
-        unset($this->AppHomeScreens);
-
-        parent::tearDown();
-    }
-
-    /**
-     * Test initialize method
-     *
-     * @return void
-     */
-    public function testInitialize()
+    public function testIndex()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
 
     /**
-     * Test validationDefault method
+     * Test view method
      *
      * @return void
      */
-    public function testValidationDefault()
+    public function testView()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
 
     /**
-     * Test buildRules method
+     * Test add method
      *
      * @return void
      */
-    public function testBuildRules()
+    public function testAdd()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test edit method
+     *
+     * @return void
+     */
+    public function testEdit()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test delete method
+     *
+     * @return void
+     */
+    public function testDelete()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
