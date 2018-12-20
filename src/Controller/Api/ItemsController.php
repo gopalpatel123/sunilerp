@@ -21,8 +21,236 @@ class ItemsController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['itemlist','itemdetail','ratingList','deliverycheck']);
+        $this->Auth->allow(['itemlist','itemdetail','ratingList','deliverycheck','searchSuggestion','searchResult']);
     }
+	
+	public function searchSuggestion($city_id=null,$item_name=null)
+      {
+        
+        $item_name = $this->request->query('item_name');
+        $customer_id = $this->request->query('app_customer_id');
+        $ItemData = [];
+		$items = [];
+        $cart_item_count = $this->Items->Carts->find('All')->where(['Carts.app_customer_id'=>$customer_id])->count();
+        if(!empty($item_name))
+        {
+			$brandData = $this->Items->AppBrands->find()->select(['id'])->where(['name' =>$item_name])
+			->where(['status'=>'Active'])->limit(1);
+			if(!empty($brandData->toArray()))
+			{	
+				foreach($brandData as $brand)
+				{
+					$brandDataID = $brand->id;	
+				}	
+				
+				$items = $this->Items->find()
+				->contain(['StockGroups'])
+				->where(['Items.app_brand_id'=>$brandDataID])
+				->where(['Items.sales_for'=>'online'])
+				->orwhere(['Items.sales_for'=>'online/offline'])
+				->order(['Items.name'=>'ASC']);
+											
+			}
+
+            if(empty($items))
+            {	
+				$items = $this->Items->find()
+				->contain(['StockGroups'])
+				->where(['Items.name'=>$item_name])
+				->orWhere(['Items.description Like' =>'%'.$item_name.'%'])
+				->where(['Items.name'=>$item_name])
+				->where(['Items.sales_for'=>'online'])
+				->orwhere(['Items.sales_for'=>'online/offline'])
+				->order(['Items.name'=>'ASC']);
+				
+			}
+
+				
+            if(empty($items->toArray()))
+            {
+				$items = $this->Items->find()
+				->contain(['StockGroups'])
+				->where(['Items.name Like' =>'%'.$item_name.'%'])
+				->where(['Items.description Like' =>'%'.$item_name.'%'])
+				->where(['Items.sales_for'=>'online'])
+				->orwhere(['Items.sales_for'=>'online/offline'])
+				->order(['Items.name'=>'ASC']);
+				
+			}
+			
+			if(empty($items->toArray()))
+            {
+				$items = $this->Items->find()
+				->contain(['StockGroups'])
+				->where(['Items.description Like' =>'%'.$item_name.'%'])
+				->where(['Items.sales_for'=>'online'])
+				->orwhere(['Items.sales_for'=>'online/offline'])
+				->order(['Items.name'=>'ASC']);
+			  
+            }
+			
+            if(!empty($items)){
+				
+              foreach ($items as $item) {  
+                $ItemData[] = ['category_id' =>$item->stock_group_id,'name'=>$item->name .' in '. $item->stock_group->name,'image' => $item->image_url,'item_name'=>$item->name,'category_name'=>$item->stock_group->name];
+					
+				}
+						  
+			}
+		
+            $success = true;
+            $message = 'Data found';
+        }
+        else {
+          $success = false;
+          $message = 'Enter Item name';
+        }
+        $this->set(['success' => $success,'message'=>$message,'cart_item_count'=>$cart_item_count,'suggestion'=>$ItemData,'_serialize' => ['success','message','cart_item_count','suggestion']]);
+      }
+	  
+	
+	 public function searchResult()
+      {
+          
+          $item_name = $this->request->query('item_name');
+          $Category = [];
+          $category_id = $this->request->query('stock_group_id');
+          $customer_id = $this->request->query('app_customer_id');
+          $where = '';
+		  $items = [];
+		  $page=@$this->request->query['page'];
+		  $limit = 20;
+          $cart_item_count = $this->Items->Carts->find('All')
+		  ->where(['Carts.app_customer_id'=>$customer_id])->count();
+
+		  if(!empty($page))
+		 {
+          if(!empty($category_id) && $category_id != 0)
+          { $where = ['Items.stock_group_id' => $category_id]; }
+		  else { $where = '';  }
+
+          if(!empty($item_name))
+          {
+			  
+			  $items = $this->SellerItems->find()
+			  ->contain(['Sellers','ItemVariations'=>function($q){
+					return $q->contain(['UnitVariations'=>['Units'],'ItemVariationMasters'])
+					->where(['ItemVariations.ready_to_sale'=>'Yes']);
+				}])
+			  ->contain(['Items' => function($q) use($item_name) {
+					return $q->where(['Items.name'=>$item_name])->where(['Items.status'=>'Active'])->contain(['Categories']);
+				}])->where(['SellerItems.city_id'=>$city_id])
+               ->where($where)
+			   ->where(['SellerItems.status' => 'Active'])
+			    ->limit($limit)
+				->page($page);
+			  
+              if(empty($items->toArray()))
+              {
+				  $items = $this->SellerItems->find()
+				  ->contain(['Sellers','ItemVariations'=>function($q){
+						return $q->contain(['UnitVariations'=>['Units'],'ItemVariationMasters'])
+						->where(['ItemVariations.ready_to_sale'=>'Yes'])->where(['ItemVariations.status'=>'Active']);
+					}])
+				  ->contain(['Items' => function($q) use($item_name) {
+						return $q->where(['Items.name Like' =>'%'.$item_name.'%'])
+						->where(['Items.status'=>'Active'])
+						->contain(['Categories']);
+					}])->where(['SellerItems.city_id'=>$city_id])
+				  ->where($where)
+				  ->where(['SellerItems.status' => 'Active'])
+					->limit($limit)
+					->page($page);
+              }
+
+			 // pr($items->toArray());exit;
+			  
+			  
+              if(!empty($items->toArray())){
+
+                $inWishList = 0;
+                foreach ($items as $item) {
+                    $Category[] = ['id' =>$item->item->category->id,'name'=> $item->item->category->name];
+                    
+					
+					$_data = array();
+					if(!empty($Category))
+					{
+						foreach ($Category as $v) { 
+						  if (isset($_data[$v['id']])) {
+							// found duplicate
+							continue;
+						  }
+						  // remember unique item
+						  $_data[$v['id']] = $v;
+						}
+					
+						// if you need a zero-based array, otheriwse work with $_data
+						$Category = array_values($_data);							
+					}
+
+					
+				
+					foreach ($item->item_variations as $items_variation_data) {
+
+                      $item_id=$item->item->id;
+                    /*  $inWishList = $this->Items->WishListItems->find()->where(['item_id'=>$item_id])->contain(['WishLists'=>function($q) use($customer_id){
+                        return $q->select(['WishLists.customer_id'])->where(['customer_id'=>$customer_id]);}])->count();
+                        if($inWishList  == 1)
+                        { $items_variation_data->inWishList = true; }
+                        else { $items_variation_data->inWishList = false; }
+                        */
+						$items_variation_data->maximum_quantity_purchase = round($items_variation_data->maximum_quantity_purchase);
+						$cs = $items_variation_data->current_stock;
+						$vs = $items_variation_data->virtual_stock;
+						$ds = $items_variation_data->demand_stock;
+						$mqp = $items_variation_data->maximum_quantity_purchase;
+						
+						$stock = 0.00;
+						
+						$stock = $cs + $vs - $ds;
+						
+						if($stock > $mqp)
+						{
+							$items_variation_data->maximum_quantity_purchase = $mqp;
+						}
+						else if($mqp > $stock)
+						{
+							$items_variation_data->maximum_quantity_purchase = $stock;
+						}
+						else {
+							$items_variation_data->maximum_quantity_purchase = $mqp;
+						}		
+						$items_variation_data->maximum_quantity_purchase = round($items_variation_data->maximum_quantity_purchase);
+						
+                        $count_cart = $this->SellerItems->Items->Carts->find()->select(['Carts.cart_count'])->where(['Carts.item_variation_id'=>$items_variation_data->id,'Carts.customer_id'=>$customer_id]);
+                          $items_variation_data->cart_count = 0;
+                            $count_value = 0;
+                        foreach ($count_cart as $count) {
+                          $count_value = $count->cart_count;
+                        }
+                        $items_variation_data->cart_count = $count_value;
+                      }
+                }					
+					
+              }
+              else { $items = []; }
+
+              $success = true;
+              $message = 'Data found';
+          }
+          else {
+            $success = false;
+            $message = 'Enter Item name';
+          }			 
+		 }else {
+            $success = false;
+            $message = 'Page No Missing';
+          }
+
+          $this->set(['success' => $success,'message'=>$message,'cart_item_count'=>$cart_item_count,'category'=>$Category,'searchResult'=>$items,'_serialize' => ['success','message','cart_item_count','category','searchResult']]);
+      }
+
 	public function itemlist(){
 			$limit=10;
 			$category_id=@$this->request->query['category_id'];

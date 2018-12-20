@@ -93,7 +93,7 @@ class ItemsTable extends Table
             'foreignKey' => 'app_brand_id',
             'joinType' => 'INNER'
 		]);
-		
+	
 		$this->hasMany('AppWishListItems', [
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
@@ -105,6 +105,11 @@ class ItemsTable extends Table
 		]);
 		
 		$this->hasMany('ItemReviewRatings', [
+            'foreignKey' => 'item_id',
+            'joinType' => 'INNER'
+		]);	
+		
+		$this->hasMany('Carts', [
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
 		]);

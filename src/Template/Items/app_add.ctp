@@ -362,7 +362,8 @@ $this->set('title', 'Create Item');
 		  var discount = $('.discount').val();
 		  
 		if(prints_rate){
-			 var dis = parseInt((prints_rate-discount));
+			var amount= prints_rate*discount/100;
+			 var dis = parseInt((prints_rate-amount));
 			$('.sales_rate').val(dis);
 		}else{
 			$('.sales_rate').val(0);
@@ -375,7 +376,8 @@ $this->set('title', 'Create Item');
 		var prints_rate = $('.prints_rate').val();
 		  var discount = $('.discount').val();
 		  if(discount){
-			   var dis = parseInt((prints_rate-discount));
+			  var amount= prints_rate*discount/100;
+			 var dis = parseInt((prints_rate-amount));
 			$('.sales_rate').val(dis);
 		  }else{
 			  $('.sales_rate').val(0);
