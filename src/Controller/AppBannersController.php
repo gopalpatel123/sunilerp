@@ -38,7 +38,8 @@ class AppBannersController extends AppController
 			$message = 'The app-banner has been saved.';
 		}
         $this->paginate = [
-            'contain' => ['StockGroups', 'Items']
+            'contain' => ['StockGroups', 'Items'],
+			'limit'=>10
         ];
         $appBanners = $this->paginate($this->AppBanners->find()->where([
 		'OR' => [
@@ -49,7 +50,7 @@ class AppBannersController extends AppController
 			 'StockGroups.name LIKE' => '%'.$search.'%',
 			 
 			'Items.name LIKE' => '%'.$search.'%'
-		 ]]));
+		 ]])->leftJoinWith('Items'));
 		
 		$stockGroups = $this->AppBanners->Items->StockGroups->find()->where(['company_id'=>$company_id,'StockGroups.is_status'=>'app']);
 		$options=[];

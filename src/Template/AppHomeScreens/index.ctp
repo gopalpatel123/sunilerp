@@ -9,7 +9,7 @@
 				<div class="pull-right">
 					<div class="row">	
 						<div class="col-md-12">	
-							<a href="<?php echo $this->url->build(['action'=>'add']) ?>" target="_blank"><button type="submit" class="go btn blue-madison input-sm" style="margin-bottom: -20px;">Add</button></a>
+							<a href="<?php echo $this->Url->build(['action'=>'add']) ?>" target="_blank"><button type="submit" class="go btn blue-madison input-sm" style="margin-bottom: -20px;">Add</button></a>
 						</div>
 					</div>		
 				</div>
