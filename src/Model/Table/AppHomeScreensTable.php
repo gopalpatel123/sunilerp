@@ -51,6 +51,7 @@ class AppHomeScreensTable extends Table
         ]);
 		$this->belongsTo('AppBanners');
 		$this->belongsTo('AppBrands');
+		$this->belongsTo('Abouts');
 		$this->belongsTo('AppHomeScreenSeconds');
     }
 

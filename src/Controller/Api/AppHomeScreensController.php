@@ -18,8 +18,30 @@ class AppHomeScreensController extends AppController
 	public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['getHomeScreen','homescreen','homescreensecond']);
+        $this->Auth->allow(['getHomeScreen','homescreen','homescreensecond','aboutpolicy']);
     }
+	
+	public function aboutpolicy(){
+		
+		$tag_name=@$this->request->query['tag_name'];
+		if(!empty($tag_name)){
+			$Abouts = $this->AppHomeScreens->Abouts->find()->where(['status'=>$tag_name]);
+			if($Abouts->toArray()){
+				$success = true;  
+				$message = 'Data Found'; 
+			}else{
+				$success = false;  
+				$message = 'Data not Found'; 
+			}
+			
+		}else{
+			$success = false;  
+			$message = 'empty tag Name'; 
+			$Abouts=[];
+		}
+		$this->set(['success' => $success,'message'=>$message,'Abouts'=>$Abouts,'_serialize' => ['success','message','Abouts']]); 
+	}
+	
 	
 	public function homescreensecond(){
 		$stock_group_id=@$this->request->query['stock_group_id'];
@@ -147,8 +169,8 @@ class AppHomeScreensController extends AppController
 				}
 				
 				if($apphome->layout == 'Big'){
-								
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$bigs[]=$apphome;	
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$bigs];
 					array_push($dynamic,$AppHome);
 				}
 			
@@ -162,48 +184,48 @@ class AppHomeScreensController extends AppController
 				
 				
 				if($apphome->layout == 'Landscape'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$lands[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$lands];
 					array_push($dynamic,$AppHome);
 				}
 				
 				if($apphome->layout == 'Square'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$square[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$square];
 					array_push($dynamic,$AppHome);
 				}
 				if($apphome->layout == 'Multiple Image with Title'){
-				
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$multiple1[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$multiple1];
 					
 					array_push($dynamic,$AppHome);
 				}
 				
 				if($apphome->layout == 'Multiple Image with Text'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$multiple2[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$multiple2];
 					array_push($dynamic,$AppHome);
 				}
 				if($apphome->layout == 'Multiple Image'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$multiple3[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$multiple3];
 					array_push($dynamic,$AppHome);
 				}
 			   if($apphome->layout == 'Multiple Image with Text Title Background'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$multiple4[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$multiple4];
 					array_push($dynamic,$AppHome);
 				} 
 				
 				if($apphome->layout == 'Multiple Image with Text Title Background Square'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$multiple5[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$multiple5];
 					array_push($dynamic,$AppHome);
 				}
 				
 			   if($apphome->layout == 'Multiple Image with Text Title'){
-					
-					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$apphome];
+					$multiple6[]=$apphome;
+					$AppHome=['title'=>$apphome->title,'layout'=>$apphome->layout,'HomeScreens'=>$multiple6];
 					array_push($dynamic,$AppHome);
 				}
 			
