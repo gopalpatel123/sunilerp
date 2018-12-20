@@ -143,7 +143,7 @@ class CartsController extends AppController
 					
 					$total_amount+=$cartnew->amount;
 				}
-				
+				$sub_total=$total_amount;
 				
 				$Carts=$Cartdatas;
 				$success = true;
@@ -161,8 +161,8 @@ class CartsController extends AppController
 			
 		}
 		
-		$this->set(compact(['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses','delivery_charge']));
-		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses','delivery_charge']);
+		$this->set(compact(['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses','delivery_charge','sub_total']));
+		$this->set('_serialize', ['success','message','Isaddress','total_amount','Carts','AppCustomerAddresses','delivery_charge','sub_total']);
 		
 	}
 	
